@@ -173,25 +173,22 @@
   font-size: 1.1rem;
   font-weight: bold;
   cursor: pointer;
-  background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #333;
   border-radius: 6px;
   transition: all 0.3s ease;
+  background: linear-gradient(135deg, #f0f8ff, #e8f4fd);
 }
 
 .spoiler-toggle:hover {
-  background: linear-gradient(135deg, #ff5252, #26c6da);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  background: linear-gradient(135deg, #e8f4fd, #d0e9ff);
+  color: #2196f3;
 }
 
 .spoiler-content {
   padding: 1rem;
   border-top: 1px solid #ddd;
   text-align: left;
+  color: #333;
 }
 
 .spoiler-content h3 {
@@ -215,6 +212,7 @@
   border-radius: 6px;
   border: 1px solid #eee;
   transition: all 0.2s ease;
+  color: #333;
 }
 
 .country-item:hover {
