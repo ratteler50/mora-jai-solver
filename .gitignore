@@ -37,8 +37,8 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# Package manager files
-package-lock.json
+# Package manager files (keep package-lock.json for reproducible builds)
+# package-lock.json  # DON'T ignore this - needed for CI/CD
 yarn.lock
 pnpm-lock.yaml
 
