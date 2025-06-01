@@ -146,21 +146,22 @@ export const applyOrangeTileLogic = (grid: TileColor[][], row: number, col: numb
 export const applyWhiteTileLogic = (grid: TileColor[][], row: number, col: number): TileColor[][] => {
   const newGrid = grid.map(r => [...r])
   
-  // Lights Out style: toggle clicked tile and adjacent white/gray tiles
-  const positionsToToggle = [
-    [row, col], // clicked tile
-    [row - 1, col], [row + 1, col], [row, col - 1], [row, col + 1] // adjacent tiles
+  // White tile behavior: 
+  // 1. Clicked white turns gray
+  // 2. Adjacent gray tiles turn white
+  // 3. All other tiles remain unchanged
+  
+  // First: Clicked white turns gray
+  newGrid[row][col] = TileColor.Gray
+  
+  // Second: Adjacent gray tiles turn white
+  const adjacentPositions = [
+    [row - 1, col], [row + 1, col], [row, col - 1], [row, col + 1]
   ]
   
-  positionsToToggle.forEach(([r, c]) => {
-    if (r >= 0 && r < 3 && c >= 0 && c < 3) {
-      const currentColor = grid[r][c]
-      if (currentColor === TileColor.White) {
-        newGrid[r][c] = TileColor.Gray
-      } else if (currentColor === TileColor.Gray) {
-        newGrid[r][c] = TileColor.White
-      }
-      // Other colors remain unchanged
+  adjacentPositions.forEach(([r, c]) => {
+    if (r >= 0 && r < 3 && c >= 0 && c < 3 && grid[r][c] === TileColor.Gray) {
+      newGrid[r][c] = TileColor.White
     }
   })
   
@@ -171,7 +172,7 @@ export const applyBlueTileLogic = (grid: TileColor[][], row: number, col: number
   const newGrid = grid.map(r => [...r])
   const centerTileColor = grid[1][1] // Middle tile (1,1)
   
-  // Copy the behavior of the center tile
+  // Copy the behavior of the center tile (apply to blue tile's own position)
   switch (centerTileColor) {
     case TileColor.Gray:
       // Do nothing
@@ -190,8 +191,23 @@ export const applyBlueTileLogic = (grid: TileColor[][], row: number, col: number
       return applyPurpleTileLogic(newGrid, row, col)
     case TileColor.Orange:
       return applyOrangeTileLogic(newGrid, row, col)
-    case TileColor.White:
-      return applyWhiteTileLogic(newGrid, row, col)
+    case TileColor.White: {
+      // Blue copying white behavior: same as white tile logic
+      // 1. Blue tile (acting as white) turns gray
+      newGrid[row][col] = TileColor.Gray
+      
+      // 2. Adjacent gray tiles turn white (other colors unchanged)
+      const adjacentPositions = [
+        [row - 1, col], [row + 1, col], [row, col - 1], [row, col + 1]
+      ]
+      
+      adjacentPositions.forEach(([r, c]) => {
+        if (r >= 0 && r < 3 && c >= 0 && c < 3 && grid[r][c] === TileColor.Gray) {
+          newGrid[r][c] = TileColor.White
+        }
+      })
+      return newGrid
+    }
     case TileColor.Blue:
       // Blue copying blue - do nothing to avoid infinite recursion
       break
