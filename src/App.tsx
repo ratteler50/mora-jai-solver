@@ -130,40 +130,85 @@ function App() {
               className={puzzleState.targetColor}>{puzzleState.targetColor}</span>
           </p>
           <p>Click corners to reset puzzle</p>
-          <div className="tile-legend">
-            <h3>Tile Behaviors:</h3>
-            <div className="legend-grid">
-              <div><span className="gray legend-tile"></span> Gray — No function
-              </div>
-              <div><span className="white legend-tile"></span> White — Expands
-                to adjacent gray or turns gray
-              </div>
-              <div><span className="black legend-tile"></span> Black — Moves row
-                tiles right
-              </div>
-              <div><span className="red legend-tile"></span> Red — White→Black,
-                Black→Red
-              </div>
-              <div><span className="yellow legend-tile"></span> Yellow — Moves
-                up one position
-              </div>
-              <div><span className="purple legend-tile"></span> Purple — Moves
-                down one position
-              </div>
-              <div><span className="green legend-tile"></span> Green — Swaps
-                with mirrored position
-              </div>
-              <div><span className="pink legend-tile"></span> Pink — Rotates
-                adjacent tiles clockwise
-              </div>
-              <div><span className="orange legend-tile"></span> Orange — Matches
-                majority adjacent color
-              </div>
-              <div><span className="blue legend-tile"></span> Blue — Copies
-                center tile behavior
+
+          <details className="spoiler-section">
+            <summary className="spoiler-toggle">Tile Behaviors</summary>
+            <div className="spoiler-content">
+              <h3>How Each Tile Works:</h3>
+              <div className="behaviors-grid">
+                <div className="behavior-item">
+                  <span className="white behavior-tile"></span>
+                  <div className="behavior-info">
+                    <strong>White</strong>
+                    <small>Expands to adjacent gray or turns gray</small>
+                  </div>
+                </div>
+                <div className="behavior-item">
+                  <span className="black behavior-tile"></span>
+                  <div className="behavior-info">
+                    <strong>Black</strong>
+                    <small>Moves row tiles right</small>
+                  </div>
+                </div>
+                <div className="behavior-item">
+                  <span className="red behavior-tile"></span>
+                  <div className="behavior-info">
+                    <strong>Red</strong>
+                    <small>White→Black, Black→Red</small>
+                  </div>
+                </div>
+                <div className="behavior-item">
+                  <span className="yellow behavior-tile"></span>
+                  <div className="behavior-info">
+                    <strong>Yellow</strong>
+                    <small>Moves up one position</small>
+                  </div>
+                </div>
+                <div className="behavior-item">
+                  <span className="purple behavior-tile"></span>
+                  <div className="behavior-info">
+                    <strong>Purple</strong>
+                    <small>Moves down one position</small>
+                  </div>
+                </div>
+                <div className="behavior-item">
+                  <span className="green behavior-tile"></span>
+                  <div className="behavior-info">
+                    <strong>Green</strong>
+                    <small>Swaps with mirrored position</small>
+                  </div>
+                </div>
+                <div className="behavior-item">
+                  <span className="pink behavior-tile"></span>
+                  <div className="behavior-info">
+                    <strong>Pink</strong>
+                    <small>Rotates adjacent tiles clockwise</small>
+                  </div>
+                </div>
+                <div className="behavior-item">
+                  <span className="orange behavior-tile"></span>
+                  <div className="behavior-info">
+                    <strong>Orange</strong>
+                    <small>Matches majority adjacent color</small>
+                  </div>
+                </div>
+                <div className="behavior-item">
+                  <span className="blue behavior-tile"></span>
+                  <div className="behavior-info">
+                    <strong>Blue</strong>
+                    <small>Copies center tile behavior</small>
+                  </div>
+                </div>
+                <div className="behavior-item">
+                  <span className="gray behavior-tile"></span>
+                  <div className="behavior-info">
+                    <strong>Gray</strong>
+                    <small>No function (empty space)</small>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
+          </details>
 
           <details className="spoiler-section">
             <summary className="spoiler-toggle">Country Symbols</summary>
@@ -179,7 +224,7 @@ function App() {
                   <div className="country-info">
                     <strong>Mora Jai</strong>
                     <span className="white legend-tile"></span>
-                    <small>White flag (arch)</small>
+                    <small>White Arch</small>
                   </div>
                 </div>
                 <div className="country-item">
@@ -191,7 +236,7 @@ function App() {
                   <div className="country-info">
                     <strong>Orinda Aries</strong>
                     <span className="black legend-tile"></span>
-                    <small>Black flag (mirror)</small>
+                    <small>Black Mirror</small>
                   </div>
                 </div>
                 <div className="country-item">
@@ -203,7 +248,7 @@ function App() {
                   <div className="country-info">
                     <strong>Fenn Aries</strong>
                     <span className="red legend-tile"></span>
-                    <small>Red flag (pentagon)</small>
+                    <small>Red Pentagon</small>
                   </div>
                 </div>
                 <div className="country-item">
@@ -215,7 +260,7 @@ function App() {
                   <div className="country-info">
                     <strong>Arch Aries</strong>
                     <span className="yellow legend-tile"></span>
-                    <small>Yellow flag (mountain)</small>
+                    <small>Yellow Mountain</small>
                   </div>
                 </div>
                 <div className="country-item">
@@ -227,7 +272,7 @@ function App() {
                   <div className="country-info">
                     <strong>Ejara</strong>
                     <span className="purple legend-tile"></span>
-                    <small>Purple flag (hourglass)</small>
+                    <small>Purple Hourglass</small>
                   </div>
                 </div>
                 <div className="country-item">
@@ -239,7 +284,7 @@ function App() {
                   <div className="country-info">
                     <strong>Nuance</strong>
                     <span className="green legend-tile"></span>
-                    <small>Green flag (diamond)</small>
+                    <small>Green Diamond</small>
                   </div>
                 </div>
                 <div className="country-item">
@@ -251,7 +296,7 @@ function App() {
                   <div className="country-info">
                     <strong>Verra</strong>
                     <span className="pink legend-tile"></span>
-                    <small>Pink flag (jigsaw)</small>
+                    <small>Pink Jigsaw</small>
                   </div>
                 </div>
                 <div className="country-item">
@@ -263,7 +308,7 @@ function App() {
                   <div className="country-info">
                     <strong>Corarica</strong>
                     <span className="orange legend-tile"></span>
-                    <small>Orange flag (chevron)</small>
+                    <small>Orange Chevron</small>
                   </div>
                 </div>
                 <div className="country-item">
@@ -275,7 +320,7 @@ function App() {
                   <div className="country-info">
                     <strong>Mt Holly</strong>
                     <span className="blue legend-tile"></span>
-                    <small>Blue flag (diamond)</small>
+                    <small>Blue Throne</small>
                   </div>
                 </div>
               </div>
