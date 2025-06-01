@@ -11,7 +11,7 @@ describe('Solver Tests', () => {
         [TileColor.Red, TileColor.Gray, TileColor.Red]
       ],
       corners: [TileColor.Red, TileColor.Red, TileColor.Red, TileColor.Red],
-      targetColor: TileColor.Red
+      targetCorners: [TileColor.Red, TileColor.Red, TileColor.Red, TileColor.Red]
     }
 
     const result = solvePuzzle(solvedState)
@@ -29,7 +29,7 @@ describe('Solver Tests', () => {
         [TileColor.Gray, TileColor.Gray, TileColor.Gray]
       ],
       corners: [TileColor.Gray, TileColor.Gray, TileColor.Gray, TileColor.Gray],
-      targetColor: TileColor.Gray // Gray target means no change needed, but also no functional tiles
+      targetCorners: [TileColor.Gray, TileColor.Gray, TileColor.Gray, TileColor.Gray] // Gray target means no change needed, but also no functional tiles
     }
 
     const estimate = estimateSolvability(unsolvableState)
@@ -46,7 +46,7 @@ describe('Solver Tests', () => {
         [TileColor.Blue, TileColor.Green, TileColor.Blue]
       ],
       corners: [TileColor.Blue, TileColor.Blue, TileColor.Blue, TileColor.Blue],
-      targetColor: TileColor.Red
+      targetCorners: [TileColor.Red, TileColor.Red, TileColor.Red, TileColor.Red]
     }
 
     const estimate = estimateSolvability(state)
@@ -63,7 +63,7 @@ describe('Solver Tests', () => {
         [TileColor.Black, TileColor.Gray, TileColor.Black]
       ],
       corners: [TileColor.White, TileColor.White, TileColor.Black, TileColor.Black],
-      targetColor: TileColor.Red
+      targetCorners: [TileColor.Red, TileColor.Red, TileColor.Red, TileColor.Red]
     }
 
     const result = solvePuzzle(simpleState)
@@ -86,7 +86,7 @@ describe('Solver Tests', () => {
         [TileColor.Blue, TileColor.Orange, TileColor.Black]
       ],
       corners: [TileColor.White, TileColor.Blue, TileColor.Blue, TileColor.Black],
-      targetColor: TileColor.Red
+      targetCorners: [TileColor.Red, TileColor.Red, TileColor.Red, TileColor.Red]
     }
 
     const states = [testState, testState] // For this simple test
@@ -105,7 +105,7 @@ describe('Solver Tests', () => {
         [TileColor.White, TileColor.Black, TileColor.Red]
       ],
       corners: [TileColor.Pink, TileColor.Blue, TileColor.White, TileColor.Red],
-      targetColor: TileColor.Gray // Impossible target
+      targetCorners: [TileColor.Gray, TileColor.Gray, TileColor.Gray, TileColor.Gray] // Impossible target
     }
 
     const startTime = performance.now()
@@ -125,7 +125,7 @@ describe('Solver Tests', () => {
         [TileColor.Orange, TileColor.Orange, TileColor.Orange]
       ],
       corners: [TileColor.Pink, TileColor.Gray, TileColor.Orange, TileColor.Orange],
-      targetColor: TileColor.Pink
+      targetCorners: [TileColor.Pink, TileColor.Pink, TileColor.Pink, TileColor.Pink]
     }
 
     console.log('Testing user reported bug case...')

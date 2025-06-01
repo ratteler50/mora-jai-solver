@@ -25,7 +25,7 @@ type AppMode = 'setup' | 'play'
 interface PuzzleState {
   grid: TileColorType[][]
   corners: TileColorType[]
-  targetColor: TileColorType
+  targetCorners: TileColorType[] // Array of 4 target colors: [topLeft, topRight, bottomLeft, bottomRight]
 }
 
 interface SetupState {
@@ -59,12 +59,12 @@ function App() {
   const [initialPuzzleState, setInitialPuzzleState] = useState<PuzzleState>({
     grid: defaultGrid,
     corners: [defaultGrid[0][0], defaultGrid[0][2], defaultGrid[2][0], defaultGrid[2][2]],
-    targetColor: TileColor.Red
+    targetCorners: [TileColor.Red, TileColor.Red, TileColor.Red, TileColor.Red]
   })
   const [puzzleState, setPuzzleState] = useState<PuzzleState>({
     grid: defaultGrid,
     corners: [defaultGrid[0][0], defaultGrid[0][2], defaultGrid[2][0], defaultGrid[2][2]],
-    targetColor: TileColor.Red
+    targetCorners: [TileColor.Red, TileColor.Red, TileColor.Red, TileColor.Red]
   })
 
   const handleTileClick = (row: number, col: number) => {
@@ -143,9 +143,19 @@ function App() {
   }
 
   const handleTargetColorSelect = (color: TileColorType) => {
+    // Set all corners to the same color (for backwards compatibility)
     setPuzzleState({
       ...puzzleState,
-      targetColor: color
+      targetCorners: [color, color, color, color]
+    })
+  }
+
+  const handleCornerTargetSelect = (cornerIndex: number, color: TileColorType) => {
+    const newTargetCorners = [...puzzleState.targetCorners]
+    newTargetCorners[cornerIndex] = color
+    setPuzzleState({
+      ...puzzleState,
+      targetCorners: newTargetCorners
     })
   }
 
@@ -219,7 +229,7 @@ function App() {
   }
 
   const checkWinCondition = (): boolean => {
-    return mode === 'play' && puzzleState.corners.every(corner => corner === puzzleState.targetColor)
+    return mode === 'play' && puzzleState.corners.every((corner, index) => corner === puzzleState.targetCorners[index])
   }
 
   const shouldHighlightTile = (row: number, col: number): boolean => {
@@ -319,12 +329,12 @@ function App() {
         {mode === 'setup' && (
           <div className="setup-controls">
             <div className="control-section">
-              <h3>Corner Symbol:</h3>
+              <h3>Set All Corners (Country Symbol):</h3>
               <div className="symbol-grid">
                 {countrySymbols.map(symbol => (
                   <div
                     key={symbol.color}
-                    className={`symbol-item ${puzzleState.targetColor === symbol.color ? 'selected' : ''}`}
+                    className={`symbol-item ${puzzleState.targetCorners.every(c => c === symbol.color) ? 'selected' : ''}`}
                     onClick={() => handleTargetColorSelect(symbol.color)}
                   >
                     <img
@@ -359,11 +369,11 @@ function App() {
           {/* Left Panel - Main Puzzle */}
           <div className="left-panel">
             <div className={`puzzle-container ${isWinning ? 'winning' : ''}`}>
-              <div className="corner top-left" onClick={mode === 'play' ? handleResetToInitial : undefined}>
-                <div className={`corner-tile ${puzzleState.corners[0]} ${isWinning ? 'winning' : ''}`}></div>
+              <div className="corner top-left" onClick={mode === 'setup' ? () => handleCornerTargetSelect(0, setupState.selectedBrushColor) : handleResetToInitial}>
+                <div className={`corner-tile ${puzzleState.targetCorners[0]} ${puzzleState.corners[0] === puzzleState.targetCorners[0] ? 'winning' : ''}`}></div>
               </div>
-              <div className="corner top-right" onClick={mode === 'play' ? handleResetToInitial : undefined}>
-                <div className={`corner-tile ${puzzleState.corners[1]} ${isWinning ? 'winning' : ''}`}></div>
+              <div className="corner top-right" onClick={mode === 'setup' ? () => handleCornerTargetSelect(1, setupState.selectedBrushColor) : handleResetToInitial}>
+                <div className={`corner-tile ${puzzleState.targetCorners[1]} ${puzzleState.corners[1] === puzzleState.targetCorners[1] ? 'winning' : ''}`}></div>
               </div>
 
               <div className="grid">
@@ -380,12 +390,12 @@ function App() {
               </div>
 
               <div className="corner bottom-left"
-                   onClick={mode === 'play' ? handleResetToInitial : undefined}>
-                <div className={`corner-tile ${puzzleState.corners[2]} ${isWinning ? 'winning' : ''}`}></div>
+                   onClick={mode === 'setup' ? () => handleCornerTargetSelect(2, setupState.selectedBrushColor) : handleResetToInitial}>
+                <div className={`corner-tile ${puzzleState.targetCorners[2]} ${puzzleState.corners[2] === puzzleState.targetCorners[2] ? 'winning' : ''}`}></div>
               </div>
               <div className="corner bottom-right"
-                   onClick={mode === 'play' ? handleResetToInitial : undefined}>
-                <div className={`corner-tile ${puzzleState.corners[3]} ${isWinning ? 'winning' : ''}`}></div>
+                   onClick={mode === 'setup' ? () => handleCornerTargetSelect(3, setupState.selectedBrushColor) : handleResetToInitial}>
+                <div className={`corner-tile ${puzzleState.targetCorners[3]} ${puzzleState.corners[3] === puzzleState.targetCorners[3] ? 'winning' : ''}`}></div>
               </div>
             </div>
 
@@ -397,15 +407,19 @@ function App() {
                 </div>
               )}
               
-              <p>Target: Get all corners to be <span
-                  className={puzzleState.targetColor}>{puzzleState.targetColor}</span>
+              <p>Targets: Get corners to be 
+                <span className={puzzleState.targetCorners[0]}>{puzzleState.targetCorners[0]}</span>, 
+                <span className={puzzleState.targetCorners[1]}>{puzzleState.targetCorners[1]}</span>, 
+                <span className={puzzleState.targetCorners[2]}>{puzzleState.targetCorners[2]}</span>, 
+                <span className={puzzleState.targetCorners[3]}>{puzzleState.targetCorners[3]}</span>
               </p>
               
               {mode === 'setup' ? (
                 <div>
                   <p>🎨 Setup Mode: Configure your puzzle</p>
                   <p>Select a brush color and click tiles to paint them</p>
-                  <p>Choose your target color, then switch to Play Mode</p>
+                  <p>Click corner circles to set individual target colors</p>
+                  <p>Or choose a country symbol to set all corners the same</p>
                 </div>
               ) : (
                 <div>

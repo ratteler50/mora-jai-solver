@@ -15,7 +15,7 @@ import {
 export interface PuzzleState {
   grid: TileColorType[][]
   corners: TileColorType[]
-  targetColor: TileColorType
+  targetCorners: TileColorType[] // Array of 4 target colors: [topLeft, topRight, bottomLeft, bottomRight]
 }
 
 export interface Move {
@@ -40,7 +40,7 @@ const gridToKey = (grid: TileColorType[][]): string => {
 
 // Helper function to check if puzzle is solved
 const isSolved = (state: PuzzleState): boolean => {
-  return state.corners.every(corner => corner === state.targetColor)
+  return state.corners.every((corner, index) => corner === state.targetCorners[index])
 }
 
 // Helper function to update corners from grid
@@ -90,7 +90,7 @@ const applyMove = (state: PuzzleState, move: Move): PuzzleState => {
   return {
     grid: newGrid,
     corners: updateCorners(newGrid),
-    targetColor: state.targetColor
+    targetCorners: state.targetCorners
   }
 }
 
@@ -223,12 +223,13 @@ export const estimateSolvability = (state: PuzzleState): {
 } => {
   // Basic heuristics to help users understand why puzzles might be unsolvable
   
-  // Check if target color exists on the grid
-  const hasTargetColor = state.grid.flat().includes(state.targetColor)
-  if (!hasTargetColor) {
+  // Check if all target colors exist on the grid
+  const gridColors = state.grid.flat()
+  const missingTargets = state.targetCorners.filter(target => !gridColors.includes(target))
+  if (missingTargets.length > 0) {
     return {
       likely: false,
-      reason: `Target color ${state.targetColor} is not present on the grid`
+      reason: `Target color(s) ${missingTargets.join(', ')} not present on the grid`
     }
   }
   
