@@ -67,10 +67,13 @@ export const applyYellowTileLogic = (grid: TileColor[][], row: number, col: numb
 
 export const applyPinkTileLogic = (grid: TileColor[][], row: number, col: number): TileColor[][] => {
   const newGrid = grid.map(r => [...r])
+  
+  // Define positions in true clockwise order starting from top-left
   const surroundingPositions = [
-    [row-1, col-1], [row-1, col], [row-1, col+1],
-    [row, col-1], [row, col+1],
-    [row+1, col-1], [row+1, col], [row+1, col+1]
+    [row-1, col-1], [row-1, col], [row-1, col+1],  // Top row: left to right
+    [row, col+1],                                   // Right side
+    [row+1, col+1], [row+1, col], [row+1, col-1],  // Bottom row: right to left  
+    [row, col-1]                                    // Left side
   ]
   
   // Get valid positions and their colors
@@ -83,11 +86,11 @@ export const applyPinkTileLogic = (grid: TileColor[][], row: number, col: number
     }
   })
   
-  // Rotate clockwise: each tile gets the color of the next tile in the sequence
+  // Rotate clockwise: each tile gets the color of the previous tile in the sequence
   validPositions.forEach((position, index) => {
     const [r, c] = position
-    const nextIndex = (index + 1) % surroundingColors.length
-    newGrid[r][c] = surroundingColors[nextIndex]
+    const prevIndex = (index - 1 + surroundingColors.length) % surroundingColors.length
+    newGrid[r][c] = surroundingColors[prevIndex]
   })
   
   return newGrid

@@ -221,15 +221,16 @@ describe('Tile Logic Tests', () => {
       // Click pink tile at (1,1) - center position
       const result = applyPinkTileLogic(grid, 1, 1)
       
-      // Expected rotation: each adjacent tile moves to next position clockwise
-      expect(result[0][0]).toBe('green') // was red
-      expect(result[0][1]).toBe('blue')  // was green
-      expect(result[0][2]).toBe('yellow') // was blue
-      expect(result[1][2]).toBe('black')  // was yellow
-      expect(result[2][2]).toBe('orange') // was black
-      expect(result[2][1]).toBe('purple') // was orange
-      expect(result[2][0]).toBe('white')  // was purple
-      expect(result[1][0]).toBe('red')    // was white
+      // Clockwise rotation: each position gets color from previous position in clockwise sequence
+      
+      expect(result[0][0]).toBe('white')  // was red, gets from (1,0) which was white
+      expect(result[0][1]).toBe('red')    // was green, gets from (0,0) which was red
+      expect(result[0][2]).toBe('green')  // was blue, gets from (0,1) which was green
+      expect(result[1][2]).toBe('blue')   // was yellow, gets from (0,2) which was blue
+      expect(result[2][2]).toBe('yellow') // was black, gets from (1,2) which was yellow
+      expect(result[2][1]).toBe('black')  // was orange, gets from (2,2) which was black
+      expect(result[2][0]).toBe('orange') // was purple, gets from (2,1) which was orange
+      expect(result[1][0]).toBe('purple') // was white, gets from (2,0) which was purple
       expect(result[1][1]).toBe('pink')   // center tile unchanged
     })
 
@@ -243,10 +244,10 @@ describe('Tile Logic Tests', () => {
       // Click pink tile at (0,0) - top-left corner
       const result = applyPinkTileLogic(grid, 0, 0)
       
-      // Only 3 adjacent tiles: (0,1), (1,0), (1,1)
-      expect(result[0][1]).toBe('yellow') // was green
-      expect(result[1][1]).toBe('white')  // was yellow
-      expect(result[1][0]).toBe('green')  // was white
+      // Corner rotation with 3 adjacent tiles in clockwise order: (0,1), (1,1), (1,0)
+      expect(result[0][1]).toBe('white')  // was green, gets from (1,0) which was white
+      expect(result[1][1]).toBe('green')  // was yellow, gets from (0,1) which was green
+      expect(result[1][0]).toBe('yellow') // was white, gets from (1,1) which was yellow
     })
   })
 
@@ -501,7 +502,7 @@ describe('Tile Logic Tests', () => {
       ])
       
       // Blue tile at (1,2) should copy yellow behavior
-      const result = applyYellowTileLogic(grid, 1, 2)
+      const result = applyBlueTileLogic(grid, 1, 2)
       
       expect(result[0][2]).toBe('blue') // blue moved up
       expect(result[1][2]).toBe('pink') // pink moved down
@@ -515,7 +516,7 @@ describe('Tile Logic Tests', () => {
       ])
       
       // Blue tile at (0,2) should copy purple behavior
-      const result = applyPurpleTileLogic(grid, 0, 2)
+      const result = applyBlueTileLogic(grid, 0, 2)
       
       expect(result[1][2]).toBe('blue') // blue moved down
       expect(result[0][2]).toBe('pink') // pink moved up
