@@ -209,7 +209,7 @@ export const formatMoves = (moves: Move[], states: PuzzleState[]): string[] => {
     const positionName = getPositionName(move.row, move.col)
     
     formattedMoves.push(
-      `${tileColor.charAt(0).toUpperCase() + tileColor.slice(1)} at ${positionName}`
+      `${positionName} ${tileColor.charAt(0).toUpperCase() + tileColor.slice(1)}`
     )
   }
   
