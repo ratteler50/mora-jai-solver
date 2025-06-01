@@ -381,7 +381,7 @@ describe('Tile Logic Tests', () => {
       expect(result[1][0]).toBe('white') // was gray
       expect(result[1][2]).toBe('white') // was gray
       expect(result[2][1]).toBe('white') // was gray
-      expect(result[1][1]).toBe('white') // remains white
+      expect(result[1][1]).toBe('gray') // white tile turns gray after expanding
     })
 
     test('turns gray when no adjacent gray tiles', () => {
@@ -413,10 +413,51 @@ describe('Tile Logic Tests', () => {
       const result = applyWhiteTileLogic(grid, 1, 1)
       
       expect(result[0][1]).toBe('white') // was gray
-      expect(result[1][1]).toBe('white') // remains white
+      expect(result[1][1]).toBe('gray') // white tile turns gray after expanding
       // Other adjacent tiles should remain unchanged
       expect(result[1][0]).toBe('yellow')
       expect(result[1][2]).toBe('pink')
+    })
+
+    test('user reported issue: white-gray-white row behavior', () => {
+      const grid = createGrid([
+        ['white', 'gray', 'white'],
+        ['red', 'blue', 'green'],
+        ['yellow', 'purple', 'orange']
+      ])
+      
+      // Click leftmost white tile at (0,0) - Lights Out style toggle
+      const result = applyWhiteTileLogic(grid, 0, 0)
+      
+      // Lights Out: toggle clicked tile (0,0) and adjacent white/gray tiles
+      // (0,0): white → gray, (0,1): gray → white, (0,2): not adjacent so unchanged
+      expect(result[0][0]).toBe('gray') // clicked white toggles to gray
+      expect(result[0][1]).toBe('white') // adjacent gray toggles to white
+      expect(result[0][2]).toBe('white') // not adjacent, unchanged
+      expect(result[1][0]).toBe('red') // non-white/gray, unchanged
+    })
+
+    test('user reported complex case: multiple whites with expansion', () => {
+      const grid = createGrid([
+        ['pink', 'blue', 'pink'],
+        ['gray', 'white', 'white'],
+        ['pink', 'red', 'pink']
+      ])
+      
+      // Click center white tile at (1,1)
+      // Should expand to adjacent gray at (1,0) and turn all whites gray
+      const result = applyWhiteTileLogic(grid, 1, 1)
+      
+      // Expected result:
+      // Pink, Blue, Pink
+      // White, Grey, Grey  
+      // Pink, Red, Pink
+      expect(result[1][0]).toBe('white') // was gray, expanded to
+      expect(result[1][1]).toBe('gray') // was white, turned gray
+      expect(result[1][2]).toBe('gray') // was white, turned gray
+      // Other tiles unchanged
+      expect(result[0][0]).toBe('pink')
+      expect(result[0][1]).toBe('blue')
       expect(result[2][1]).toBe('red')
     })
   })

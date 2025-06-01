@@ -33,7 +33,7 @@ Individual tile behavior functions implement 10 different tile mechanics:
 - **Pink tiles** — Rotate all adjacent tiles clockwise
 - **Purple tiles** — Move down one position  
 - **Orange tiles** — Change to match the majority color of adjacent tiles
-- **White tiles** — Expand to adjacent gray tiles, or turn gray if no adjacent gray tiles
+- **White tiles** — "Lights Out" style: toggle clicked tile and adjacent white/gray tiles (white ↔ gray)
 - **Blue tiles** — Copy the behavior of the center tile (position 1,1)
 
 ### Automatic Solver (src/solver.ts)

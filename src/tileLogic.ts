@@ -145,21 +145,24 @@ export const applyOrangeTileLogic = (grid: TileColor[][], row: number, col: numb
 
 export const applyWhiteTileLogic = (grid: TileColor[][], row: number, col: number): TileColor[][] => {
   const newGrid = grid.map(r => [...r])
-  const adjacentPositions = [
-    [row - 1, col], [row + 1, col], [row, col - 1], [row, col + 1]
+  
+  // Lights Out style: toggle clicked tile and adjacent white/gray tiles
+  const positionsToToggle = [
+    [row, col], // clicked tile
+    [row - 1, col], [row + 1, col], [row, col - 1], [row, col + 1] // adjacent tiles
   ]
   
-  let hasAdjacentGray = false
-  adjacentPositions.forEach(([r, c]) => {
-    if (r >= 0 && r < 3 && c >= 0 && c < 3 && grid[r][c] === TileColor.Gray) {
-      hasAdjacentGray = true
-      newGrid[r][c] = TileColor.White // Turn gray tiles white
+  positionsToToggle.forEach(([r, c]) => {
+    if (r >= 0 && r < 3 && c >= 0 && c < 3) {
+      const currentColor = grid[r][c]
+      if (currentColor === TileColor.White) {
+        newGrid[r][c] = TileColor.Gray
+      } else if (currentColor === TileColor.Gray) {
+        newGrid[r][c] = TileColor.White
+      }
+      // Other colors remain unchanged
     }
   })
-  
-  if (!hasAdjacentGray) {
-    newGrid[row][col] = TileColor.Gray // White tile turns gray
-  }
   
   return newGrid
 }
