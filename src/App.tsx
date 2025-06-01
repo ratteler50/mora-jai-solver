@@ -14,62 +14,95 @@ import {
   applyBlueTileLogic
 } from './tileLogic'
 
+type AppMode = 'setup' | 'play'
+
 interface PuzzleState {
   grid: TileColorType[][]
   corners: TileColorType[]
   targetColor: TileColorType
 }
 
+interface SetupState {
+  selectedBrushColor: TileColorType
+}
+
 function App() {
+  const defaultGrid = [
+    [TileColor.Pink, TileColor.Gray, TileColor.Gray],
+    [TileColor.Gray, TileColor.Yellow, TileColor.Yellow],
+    [TileColor.Gray, TileColor.Yellow, TileColor.Yellow]
+  ]
+  
+  const [mode, setMode] = useState<AppMode>('setup')
+  const [setupState, setSetupState] = useState<SetupState>({
+    selectedBrushColor: TileColor.White
+  })
+  const [initialPuzzleState, setInitialPuzzleState] = useState<PuzzleState>({
+    grid: defaultGrid,
+    corners: [defaultGrid[0][0], defaultGrid[0][2], defaultGrid[2][0], defaultGrid[2][2]],
+    targetColor: TileColor.Yellow
+  })
   const [puzzleState, setPuzzleState] = useState<PuzzleState>({
-    grid: [
-      [TileColor.White, TileColor.Pink, TileColor.Gray],
-      [TileColor.Green, TileColor.Orange, TileColor.Blue],
-      [TileColor.Yellow, TileColor.Purple, TileColor.Black]
-    ],
-    corners: [TileColor.White, TileColor.Gray, TileColor.Yellow, TileColor.Black],
-    targetColor: TileColor.Red
+    grid: defaultGrid,
+    corners: [defaultGrid[0][0], defaultGrid[0][2], defaultGrid[2][0], defaultGrid[2][2]],
+    targetColor: TileColor.Yellow
   })
 
   const handleTileClick = (row: number, col: number) => {
-    const currentColor = puzzleState.grid[row][col]
-    const newState = {...puzzleState}
+    if (mode === 'setup') {
+      // Setup mode: paint with selected brush color
+      const newGrid = puzzleState.grid.map((r, rIndex) =>
+        r.map((c, cIndex) =>
+          rIndex === row && cIndex === col ? setupState.selectedBrushColor : c
+        )
+      )
+      const newState = {
+        ...puzzleState,
+        grid: newGrid,
+        corners: updateCorners(newGrid)
+      }
+      setPuzzleState(newState)
+    } else {
+      // Play mode: apply tile logic
+      const currentColor = puzzleState.grid[row][col]
+      const newState = {...puzzleState}
 
-    switch (currentColor) {
-      case TileColor.Gray:
-        // Gray tiles do nothing
-        break
-      case TileColor.Black:
-        newState.grid = applyBlackTileLogic(newState.grid, row)
-        break
-      case TileColor.Red:
-        newState.grid = applyRedTileLogic(newState.grid)
-        break
-      case TileColor.Green:
-        newState.grid = applyGreenTileLogic(newState.grid, row, col)
-        break
-      case TileColor.Yellow:
-        newState.grid = applyYellowTileLogic(newState.grid, row, col)
-        break
-      case TileColor.Pink:
-        newState.grid = applyPinkTileLogic(newState.grid, row, col)
-        break
-      case TileColor.Purple:
-        newState.grid = applyPurpleTileLogic(newState.grid, row, col)
-        break
-      case TileColor.Orange:
-        newState.grid = applyOrangeTileLogic(newState.grid, row, col)
-        break
-      case TileColor.White:
-        newState.grid = applyWhiteTileLogic(newState.grid, row, col)
-        break
-      case TileColor.Blue:
-        newState.grid = applyBlueTileLogic(newState.grid, row, col)
-        break
+      switch (currentColor) {
+        case TileColor.Gray:
+          // Gray tiles do nothing
+          break
+        case TileColor.Black:
+          newState.grid = applyBlackTileLogic(newState.grid, row)
+          break
+        case TileColor.Red:
+          newState.grid = applyRedTileLogic(newState.grid)
+          break
+        case TileColor.Green:
+          newState.grid = applyGreenTileLogic(newState.grid, row, col)
+          break
+        case TileColor.Yellow:
+          newState.grid = applyYellowTileLogic(newState.grid, row, col)
+          break
+        case TileColor.Pink:
+          newState.grid = applyPinkTileLogic(newState.grid, row, col)
+          break
+        case TileColor.Purple:
+          newState.grid = applyPurpleTileLogic(newState.grid, row, col)
+          break
+        case TileColor.Orange:
+          newState.grid = applyOrangeTileLogic(newState.grid, row, col)
+          break
+        case TileColor.White:
+          newState.grid = applyWhiteTileLogic(newState.grid, row, col)
+          break
+        case TileColor.Blue:
+          newState.grid = applyBlueTileLogic(newState.grid, row, col)
+          break
+      }
+
+      newState.corners = updateCorners(newState.grid)
+      setPuzzleState(newState)
     }
-
-    newState.corners = updateCorners(newState.grid)
-    setPuzzleState(newState)
   }
 
 
@@ -79,27 +112,162 @@ function App() {
     ]
   }
 
-  const handleCornerClick = () => {
+  const handleModeSwitch = () => {
+    if (mode === 'setup') {
+      // Switching from setup to play: save current state as initial
+      setInitialPuzzleState(puzzleState)
+      setMode('play')
+    } else {
+      // Switching from play to setup: go back to setup mode
+      setMode('setup')
+    }
+  }
+
+  const handleTargetColorSelect = (color: TileColorType) => {
     setPuzzleState({
-      grid: [
-        [TileColor.White, TileColor.Pink, TileColor.Gray],
-        [TileColor.Green, TileColor.Orange, TileColor.Blue],
-        [TileColor.Yellow, TileColor.Purple, TileColor.Black]
-      ],
-      corners: [TileColor.White, TileColor.Gray, TileColor.Yellow, TileColor.Black],
-      targetColor: TileColor.Red
+      ...puzzleState,
+      targetColor: color
     })
   }
+
+  const handleBrushColorSelect = (color: TileColorType) => {
+    setSetupState({
+      ...setupState,
+      selectedBrushColor: color
+    })
+  }
+
+  const handleResetToInitial = () => {
+    setPuzzleState({...initialPuzzleState})
+  }
+
+  const checkWinCondition = (): boolean => {
+    return mode === 'play' && puzzleState.corners.every(corner => corner === puzzleState.targetColor)
+  }
+
+  const isWinning = checkWinCondition()
+
+  const allColors = [
+    TileColor.White, TileColor.Black, TileColor.Red, TileColor.Yellow, 
+    TileColor.Purple, TileColor.Green, TileColor.Pink, TileColor.Orange, 
+    TileColor.Blue, TileColor.Gray
+  ]
+
+  const countrySymbols = [
+    {
+      color: TileColor.White,
+      name: "Mora Jai",
+      image: "https://static0.gamerantimages.com/wordpress/wp-content/uploads/2025/05/blue-prince-country-symbols-mora-jai.jpg",
+      description: "White Arch"
+    },
+    {
+      color: TileColor.Black,
+      name: "Orinda Aries", 
+      image: "https://static0.gamerantimages.com/wordpress/wp-content/uploads/2025/05/blue-prince-country-symbols-orinda-aries.jpg",
+      description: "Black Mirror"
+    },
+    {
+      color: TileColor.Red,
+      name: "Fenn Aries",
+      image: "https://static0.gamerantimages.com/wordpress/wp-content/uploads/2025/05/blue-prince-country-symbols-fenn-aries.jpg", 
+      description: "Red Pentagon"
+    },
+    {
+      color: TileColor.Yellow,
+      name: "Arch Aries",
+      image: "https://static0.gamerantimages.com/wordpress/wp-content/uploads/2025/05/blue-prince-country-symbols-arch-aries.jpg",
+      description: "Yellow Mountain"
+    },
+    {
+      color: TileColor.Purple,
+      name: "Ejara",
+      image: "https://static0.gamerantimages.com/wordpress/wp-content/uploads/2025/05/blue-prince-country-symbols-eraja.jpg",
+      description: "Purple Hourglass"
+    },
+    {
+      color: TileColor.Green,
+      name: "Nuance",
+      image: "https://static0.gamerantimages.com/wordpress/wp-content/uploads/2025/05/blue-prince-country-symbols-nuance.jpg",
+      description: "Green Diamond"
+    },
+    {
+      color: TileColor.Pink,
+      name: "Verra",
+      image: "https://static0.gamerantimages.com/wordpress/wp-content/uploads/2025/05/blue-prince-country-symbols-verra.jpg",
+      description: "Pink Jigsaw"
+    },
+    {
+      color: TileColor.Orange,
+      name: "Corarica",
+      image: "https://static0.gamerantimages.com/wordpress/wp-content/uploads/2025/05/blue-prince-country-symbols-corarica.jpg",
+      description: "Orange Chevron"
+    },
+    {
+      color: TileColor.Blue,
+      name: "Mt Holly",
+      image: "/mora-jai-solver/images/corner-symbols/mount_holly.png",
+      description: "Blue Throne"
+    }
+  ]
 
   return (
       <div className="app">
         <h1>Mora Jai Box Solver</h1>
-        <div className="puzzle-container">
-          <div className="corner top-left" onClick={() => handleCornerClick()}>
-            <div className={`corner-tile ${puzzleState.corners[0]}`}></div>
+        
+        <div className="mode-controls">
+          <button 
+            className={`mode-button ${mode === 'setup' ? 'active' : ''}`}
+            onClick={handleModeSwitch}
+          >
+            {mode === 'setup' ? '🎮 Switch to Play Mode' : '⚙️ Switch to Setup Mode'}
+          </button>
+        </div>
+
+        {mode === 'setup' && (
+          <div className="setup-controls">
+            <div className="control-section">
+              <h3>Corner Symbol:</h3>
+              <div className="symbol-grid">
+                {countrySymbols.map(symbol => (
+                  <div
+                    key={symbol.color}
+                    className={`symbol-item ${puzzleState.targetColor === symbol.color ? 'selected' : ''}`}
+                    onClick={() => handleTargetColorSelect(symbol.color)}
+                  >
+                    <img
+                      src={symbol.image}
+                      alt={`${symbol.name} symbol`}
+                      className="symbol-image"
+                    />
+                    <div className="symbol-info">
+                      <strong>{symbol.name}</strong>
+                      <small>{symbol.description}</small>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="control-section">
+              <h3>Brush Color:</h3>
+              <div className="color-palette">
+                {allColors.map(color => (
+                  <button
+                    key={color}
+                    className={`color-btn ${color} ${setupState.selectedBrushColor === color ? 'selected' : ''}`}
+                    onClick={() => handleBrushColorSelect(color)}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
-          <div className="corner top-right" onClick={() => handleCornerClick()}>
-            <div className={`corner-tile ${puzzleState.corners[1]}`}></div>
+        )}
+
+        <div className={`puzzle-container ${isWinning ? 'winning' : ''}`}>
+          <div className="corner top-left" onClick={mode === 'play' ? handleResetToInitial : undefined}>
+            <div className={`corner-tile ${puzzleState.corners[0]} ${isWinning ? 'winning' : ''}`}></div>
+          </div>
+          <div className="corner top-right" onClick={mode === 'play' ? handleResetToInitial : undefined}>
+            <div className={`corner-tile ${puzzleState.corners[1]} ${isWinning ? 'winning' : ''}`}></div>
           </div>
 
           <div className="grid">
@@ -107,7 +275,7 @@ function App() {
                 row.map((color, colIndex) => (
                     <div
                         key={`${rowIndex}-${colIndex}`}
-                        className={`tile ${color}`}
+                        className={`tile ${color} ${mode === 'setup' ? 'setup-mode' : ''}`}
                         onClick={() => handleTileClick(rowIndex, colIndex)}
                     >
                     </div>
@@ -116,20 +284,40 @@ function App() {
           </div>
 
           <div className="corner bottom-left"
-               onClick={() => handleCornerClick()}>
-            <div className={`corner-tile ${puzzleState.corners[2]}`}></div>
+               onClick={mode === 'play' ? handleResetToInitial : undefined}>
+            <div className={`corner-tile ${puzzleState.corners[2]} ${isWinning ? 'winning' : ''}`}></div>
           </div>
           <div className="corner bottom-right"
-               onClick={() => handleCornerClick()}>
-            <div className={`corner-tile ${puzzleState.corners[3]}`}></div>
+               onClick={mode === 'play' ? handleResetToInitial : undefined}>
+            <div className={`corner-tile ${puzzleState.corners[3]} ${isWinning ? 'winning' : ''}`}></div>
           </div>
         </div>
 
         <div className="info">
+          {isWinning && (
+            <div className="win-message">
+              <h2>🎉 Puzzle Solved! 🎉</h2>
+              <p>All corners match the target color!</p>
+            </div>
+          )}
+          
           <p>Target: Get all corners to be <span
               className={puzzleState.targetColor}>{puzzleState.targetColor}</span>
           </p>
-          <p>Click corners to reset puzzle</p>
+          
+          {mode === 'setup' ? (
+            <div>
+              <p>🎨 Setup Mode: Configure your puzzle</p>
+              <p>Select a brush color and click tiles to paint them</p>
+              <p>Choose your target color, then switch to Play Mode</p>
+            </div>
+          ) : (
+            <div>
+              <p>🎮 Play Mode: Solve the puzzle</p>
+              <p>Click tiles to activate their behaviors</p>
+              <p>Click corners to reset to initial state</p>
+            </div>
+          )}
 
           <details className="spoiler-section">
             <summary className="spoiler-toggle">Tile Behaviors</summary>
