@@ -1,54 +1,66 @@
-# React + TypeScript + Vite
+# Mora Jai Box Solver
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React TypeScript application that simulates the puzzle mechanics from the Blue Prince game. The app allows users to interact with a 3x3 grid of colored tiles, each with different behaviors when clicked, with the goal of getting all four corners to be the same target color.
 
-Currently, two official plugins are available:
+## 🎮 Live Demo
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+**[Play the game here!](https://ratteler50.github.io/mora-jai-solver/)**
 
-## Expanding the ESLint configuration
+## 🧩 Game Mechanics
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+The puzzle features a 3x3 grid where each tile has different behaviors when clicked:
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+- **White tiles**: Affect surrounding tiles in a cross pattern
+- **Pink tiles**: Rotate all surrounding tiles 
+- **Green tiles**: Swap with mirrored position on grid
+- **Orange tiles**: Transform based on most common adjacent color
+
+**Objective**: Get all four corner tiles to match the target color shown at the top.
+
+## 🚀 Development
+
+### Prerequisites
+- Node.js (v18 or later)
+- npm
+
+### Setup
+```bash
+git clone https://github.com/ratteler50/mora-jai-solver.git
+cd mora-jai-solver
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Available Scripts
+- `npm run dev` - Start development server (http://localhost:5173/)
+- `npm run build` - Build for production
+- `npm run lint` - Run ESLint
+- `npm run preview` - Preview production build locally
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 🔧 Tech Stack
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+- **React 18** with TypeScript
+- **Vite** for build tooling and development server
+- **CSS** for styling (no external UI libraries)
+- **GitHub Pages** for deployment
+- **GitHub Actions** for CI/CD
+
+## 📦 Deployment
+
+The app automatically deploys to GitHub Pages when changes are pushed to the `main` branch. The deployment uses GitHub's official Pages action for reliable builds and proper MIME type handling.
+
+## 🏗️ Architecture
+
+- **Single Component Design**: Main logic in `src/App.tsx`
+- **State Management**: Simple React state with `PuzzleState` interface
+- **Responsive Design**: CSS Grid layout that works on mobile and desktop
+- **No External Dependencies**: Pure React/TypeScript implementation
+
+## 📁 Project Structure
+
+```
+src/
+├── App.tsx          # Main component with puzzle logic
+├── App.css          # Styling for grid, tiles, and UI
+├── main.tsx         # React entry point
+└── index.css        # Global styles
 ```

@@ -31,8 +31,11 @@ The core puzzle mechanics are implemented in `src/App.tsx` with different tile b
 
 ### Deployment Configuration
 - Configured for GitHub Pages with base path `/mora-jai-solver/`
-- GitHub Actions workflow at `.github/workflows/deploy.yml` handles automatic deployment
-- For local development, access at root path (http://localhost:5173/), not the GitHub Pages path
+- Uses official GitHub Actions deployment workflow (not third-party actions)
+- GitHub Pages source is set to "GitHub Actions" (not "Deploy from a branch")
+- Automatically deploys when pushing to `main` branch
+- Live site: https://ratteler50.github.io/mora-jai-solver/
+- For local development, access at root path (http://localhost:5173/)
 
 ## Key Files
 - `src/App.tsx` - Main component with puzzle logic and UI

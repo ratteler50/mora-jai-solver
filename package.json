@@ -6,9 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "preview": "vite preview",
-    "deploy": "vite gh-pages"
+    "lint": "eslint ."
   },
   "dependencies": {
     "react": "^19.1.0",
