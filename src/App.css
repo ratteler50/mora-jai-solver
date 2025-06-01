@@ -105,6 +105,18 @@
   background-color: #ffd700;
 }
 
+.gray {
+  background-color: #808080;
+}
+
+.black {
+  background-color: #000000;
+}
+
+.purple {
+  background-color: #8a2be2;
+}
+
 .info {
   margin-top: 2rem;
   font-size: 1.1rem;
@@ -119,4 +131,29 @@
   padding: 0.2rem 0.5rem;
   border-radius: 4px;
   color: white;
+}
+
+.tile-legend {
+  margin-top: 1.5rem;
+  text-align: left;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.legend-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.legend-tile {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 1px solid #333;
+  border-radius: 3px;
+  margin-right: 8px;
+  vertical-align: middle;
 }

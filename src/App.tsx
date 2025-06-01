@@ -2,13 +2,16 @@ import { useState } from 'react'
 import './App.css'
 
 const TileColor = {
-  White: 'white',
-  Pink: 'pink',
-  Green: 'green',
-  Orange: 'orange',
-  Blue: 'blue',
+  Gray: 'gray',
+  Black: 'black',
   Red: 'red',
-  Yellow: 'yellow'
+  Green: 'green',
+  Yellow: 'yellow',
+  Pink: 'pink',
+  Purple: 'purple',
+  Orange: 'orange',
+  White: 'white',
+  Blue: 'blue'
 } as const
 
 type TileColor = typeof TileColor[keyof typeof TileColor]
@@ -22,12 +25,12 @@ interface PuzzleState {
 function App() {
   const [puzzleState, setPuzzleState] = useState<PuzzleState>({
     grid: [
-      [TileColor.White, TileColor.Pink, TileColor.White],
-      [TileColor.Green, TileColor.Orange, TileColor.Green],
-      [TileColor.White, TileColor.Pink, TileColor.White]
+      [TileColor.White, TileColor.Pink, TileColor.Gray],
+      [TileColor.Green, TileColor.Orange, TileColor.Blue],
+      [TileColor.Yellow, TileColor.Purple, TileColor.Black]
     ],
-    corners: [TileColor.White, TileColor.White, TileColor.White, TileColor.White],
-    targetColor: TileColor.Orange
+    corners: [TileColor.White, TileColor.Gray, TileColor.Yellow, TileColor.Black],
+    targetColor: TileColor.Red
   })
 
   const handleTileClick = (row: number, col: number) => {
@@ -35,17 +38,35 @@ function App() {
     const newState = { ...puzzleState }
     
     switch (currentColor) {
-      case TileColor.White:
-        newState.grid = applyWhiteTileLogic(newState.grid, row, col)
+      case TileColor.Gray:
+        // Gray tiles do nothing
         break
-      case TileColor.Pink:
-        newState.grid = applyPinkTileLogic(newState.grid, row, col)
+      case TileColor.Black:
+        newState.grid = applyBlackTileLogic(newState.grid, row)
+        break
+      case TileColor.Red:
+        newState.grid = applyRedTileLogic(newState.grid)
         break
       case TileColor.Green:
         newState.grid = applyGreenTileLogic(newState.grid, row, col)
         break
+      case TileColor.Yellow:
+        newState.grid = applyYellowTileLogic(newState.grid, row, col)
+        break
+      case TileColor.Pink:
+        newState.grid = applyPinkTileLogic(newState.grid, row, col)
+        break
+      case TileColor.Purple:
+        newState.grid = applyPurpleTileLogic(newState.grid, row, col)
+        break
       case TileColor.Orange:
         newState.grid = applyOrangeTileLogic(newState.grid, row, col)
+        break
+      case TileColor.White:
+        newState.grid = applyWhiteTileLogic(newState.grid, row, col)
+        break
+      case TileColor.Blue:
+        newState.grid = applyBlueTileLogic(newState.grid, row, col)
         break
     }
     
@@ -53,17 +74,105 @@ function App() {
     setPuzzleState(newState)
   }
 
+  const applyBlackTileLogic = (grid: TileColor[][], row: number): TileColor[][] => {
+    const newGrid = grid.map(r => [...r])
+    // Move all tiles in the row one position to the right
+    const currentRow = newGrid[row]
+    const lastTile = currentRow[2]
+    for (let i = 2; i > 0; i--) {
+      currentRow[i] = currentRow[i - 1]
+    }
+    currentRow[0] = lastTile
+    return newGrid
+  }
+
+  const applyRedTileLogic = (grid: TileColor[][]): TileColor[][] => {
+    const newGrid = grid.map(r => [...r])
+    // Turn all white tiles black and all black tiles red
+    for (let r = 0; r < 3; r++) {
+      for (let c = 0; c < 3; c++) {
+        if (newGrid[r][c] === TileColor.White) {
+          newGrid[r][c] = TileColor.Black
+        } else if (newGrid[r][c] === TileColor.Black) {
+          newGrid[r][c] = TileColor.Red
+        }
+      }
+    }
+    return newGrid
+  }
+
+  const applyYellowTileLogic = (grid: TileColor[][], row: number, col: number): TileColor[][] => {
+    const newGrid = grid.map(r => [...r])
+    // Move tile up one position
+    if (row > 0) {
+      const temp = newGrid[row - 1][col]
+      newGrid[row - 1][col] = newGrid[row][col]
+      newGrid[row][col] = temp
+    }
+    return newGrid
+  }
+
+  const applyPurpleTileLogic = (grid: TileColor[][], row: number, col: number): TileColor[][] => {
+    const newGrid = grid.map(r => [...r])
+    // Move tile down one position
+    if (row < 2) {
+      const temp = newGrid[row + 1][col]
+      newGrid[row + 1][col] = newGrid[row][col]
+      newGrid[row][col] = temp
+    }
+    return newGrid
+  }
+
   const applyWhiteTileLogic = (grid: TileColor[][], row: number, col: number): TileColor[][] => {
     const newGrid = grid.map(r => [...r])
-    const directions = [[-1, 0], [1, 0], [0, -1], [0, 1], [0, 0]]
+    const adjacentPositions = [
+      [row - 1, col], [row + 1, col], [row, col - 1], [row, col + 1]
+    ]
     
-    directions.forEach(([dr, dc]) => {
-      const newRow = row + dr
-      const newCol = col + dc
-      if (newRow >= 0 && newRow < 3 && newCol >= 0 && newCol < 3) {
-        newGrid[newRow][newCol] = getNextColor(newGrid[newRow][newCol])
+    let hasAdjacentGray = false
+    adjacentPositions.forEach(([r, c]) => {
+      if (r >= 0 && r < 3 && c >= 0 && c < 3 && grid[r][c] === TileColor.Gray) {
+        hasAdjacentGray = true
+        newGrid[r][c] = TileColor.White // Turn gray tiles white
       }
     })
+    
+    if (!hasAdjacentGray) {
+      newGrid[row][col] = TileColor.Gray // White tile turns gray
+    }
+    
+    return newGrid
+  }
+
+  const applyBlueTileLogic = (grid: TileColor[][], row: number, col: number): TileColor[][] => {
+    const newGrid = grid.map(r => [...r])
+    const centerTileColor = grid[1][1] // Middle tile (1,1)
+    
+    // Copy the behavior of the center tile
+    switch (centerTileColor) {
+      case TileColor.Gray:
+        // Do nothing
+        break
+      case TileColor.Black:
+        return applyBlackTileLogic(newGrid, row)
+      case TileColor.Red:
+        return applyRedTileLogic(newGrid)
+      case TileColor.Green:
+        return applyGreenTileLogic(newGrid, row, col)
+      case TileColor.Yellow:
+        return applyYellowTileLogic(newGrid, row, col)
+      case TileColor.Pink:
+        return applyPinkTileLogic(newGrid, row, col)
+      case TileColor.Purple:
+        return applyPurpleTileLogic(newGrid, row, col)
+      case TileColor.Orange:
+        return applyOrangeTileLogic(newGrid, row, col)
+      case TileColor.White:
+        return applyWhiteTileLogic(newGrid, row, col)
+      case TileColor.Blue:
+        // Blue copying blue - do nothing to avoid infinite recursion
+        break
+    }
     
     return newGrid
   }
@@ -123,24 +232,28 @@ function App() {
       }
     })
     
-    let mostCommonColor: TileColor = TileColor.Orange
+    let mostCommonColor: TileColor = grid[row][col] // Keep current color as default
     let maxCount = 0
+    let hasMultipleMajorities = false
+    
     Object.entries(adjacentColors).forEach(([color, count]) => {
       if (count > maxCount) {
         maxCount = count
         mostCommonColor = color as TileColor
+        hasMultipleMajorities = false
+      } else if (count === maxCount && maxCount > 0) {
+        hasMultipleMajorities = true
       }
     })
     
-    newGrid[row][col] = mostCommonColor
+    // Only change if there's a clear majority
+    if (!hasMultipleMajorities && maxCount > 0) {
+      newGrid[row][col] = mostCommonColor
+    }
+    
     return newGrid
   }
 
-  const getNextColor = (color: TileColor): TileColor => {
-    const colors: TileColor[] = [TileColor.White, TileColor.Pink, TileColor.Green, TileColor.Orange]
-    const currentIndex = colors.indexOf(color)
-    return colors[(currentIndex + 1) % colors.length]
-  }
 
   const updateCorners = (grid: TileColor[][]): TileColor[] => {
     return [
@@ -151,12 +264,12 @@ function App() {
   const handleCornerClick = () => {
     setPuzzleState({
       grid: [
-        [TileColor.White, TileColor.Pink, TileColor.White],
-        [TileColor.Green, TileColor.Orange, TileColor.Green],
-        [TileColor.White, TileColor.Pink, TileColor.White]
+        [TileColor.White, TileColor.Pink, TileColor.Gray],
+        [TileColor.Green, TileColor.Orange, TileColor.Blue],
+        [TileColor.Yellow, TileColor.Purple, TileColor.Black]
       ],
-      corners: [TileColor.White, TileColor.White, TileColor.White, TileColor.White],
-      targetColor: TileColor.Orange
+      corners: [TileColor.White, TileColor.Gray, TileColor.Yellow, TileColor.Black],
+      targetColor: TileColor.Red
     })
   }
 
@@ -195,7 +308,21 @@ function App() {
       <div className="info">
         <p>Target: Get all corners to be <span className={puzzleState.targetColor}>{puzzleState.targetColor}</span></p>
         <p>Click corners to reset puzzle</p>
-        <p>CURRENTLY WIP!  Right now only allows actions not solving!</p>
+        <div className="tile-legend">
+          <h3>Tile Behaviors:</h3>
+          <div className="legend-grid">
+            <div><span className="gray legend-tile"></span> Gray — No function</div>
+            <div><span className="black legend-tile"></span> Black — Moves row tiles right</div>
+            <div><span className="red legend-tile"></span> Red — White→Black, Black→Red</div>
+            <div><span className="green legend-tile"></span> Green — Swaps with mirrored position</div>
+            <div><span className="yellow legend-tile"></span> Yellow — Moves up one position</div>
+            <div><span className="pink legend-tile"></span> Pink — Rotates adjacent tiles clockwise</div>
+            <div><span className="purple legend-tile"></span> Purple — Moves down one position</div>
+            <div><span className="orange legend-tile"></span> Orange — Matches majority adjacent color</div>
+            <div><span className="white legend-tile"></span> White — Expands to adjacent gray or turns gray</div>
+            <div><span className="blue legend-tile"></span> Blue — Copies center tile behavior</div>
+          </div>
+        </div>
       </div>
     </div>
   )

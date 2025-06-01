@@ -10,10 +10,16 @@ A React TypeScript application that simulates the puzzle mechanics from the Blue
 
 The puzzle features a 3x3 grid where each tile has different behaviors when clicked:
 
-- **White tiles**: Affect surrounding tiles in a cross pattern
-- **Pink tiles**: Rotate all surrounding tiles 
-- **Green tiles**: Swap with mirrored position on grid
-- **Orange tiles**: Transform based on most common adjacent color
+- **Gray tiles** — No function (empty space)
+- **Black tiles** — Move all tiles in the row one position to the right  
+- **Red tiles** — Turn all white tiles black and all black tiles red
+- **Green tiles** — Swap positions with the mirrored tile on the opposite side
+- **Yellow tiles** — Move up one position
+- **Pink tiles** — Rotate all adjacent tiles clockwise
+- **Purple tiles** — Move down one position  
+- **Orange tiles** — Change to match the majority color of adjacent tiles
+- **White tiles** — Expand to adjacent gray tiles, or turn gray if no adjacent gray tiles
+- **Blue tiles** — Copy the behavior of the center tile (position 1,1)
 
 **Objective**: Get all four corner tiles to match the target color shown at the top.
 

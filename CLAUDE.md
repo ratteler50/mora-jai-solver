@@ -17,11 +17,17 @@ This is a Mora Jai Box solver - a React TypeScript application that simulates th
 ## Architecture
 
 ### Puzzle Logic
-The core puzzle mechanics are implemented in `src/App.tsx` with different tile behaviors:
-- **White tiles**: Affect surrounding tiles in cross pattern when clicked
-- **Pink tiles**: Rotate all surrounding tiles 
-- **Green tiles**: Swap with mirrored position on grid
-- **Orange tiles**: Transform based on most common adjacent color
+The core puzzle mechanics are implemented in `src/App.tsx` with 10 different tile behaviors:
+- **Gray tiles** — No function (empty space)
+- **Black tiles** — Move all tiles in the row one position to the right  
+- **Red tiles** — Turn all white tiles black and all black tiles red
+- **Green tiles** — Swap positions with the mirrored tile on the opposite side
+- **Yellow tiles** — Move up one position
+- **Pink tiles** — Rotate all adjacent tiles clockwise
+- **Purple tiles** — Move down one position  
+- **Orange tiles** — Change to match the majority color of adjacent tiles
+- **White tiles** — Expand to adjacent gray tiles, or turn gray if no adjacent gray tiles
+- **Blue tiles** — Copy the behavior of the center tile (position 1,1)
 
 ### State Management
 - Single React state object (`PuzzleState`) contains:
