@@ -142,6 +142,52 @@ function App() {
             <div><span className="blue legend-tile"></span> Blue — Copies center tile behavior</div>
           </div>
         </div>
+
+        <details className="spoiler-section">
+          <summary className="spoiler-toggle">🎮 Blue Prince Game Solutions (Spoilers)</summary>
+          <div className="spoiler-content">
+            <h3>Country Symbols & Target Colors:</h3>
+            <div className="countries-grid">
+              <div className="country-item">
+                <span className="black legend-tile"></span>
+                <strong>Orinda Aries</strong> — Black flag
+              </div>
+              <div className="country-item">
+                <span className="red legend-tile"></span>
+                <strong>Fenn Aries</strong> — Red flag (pentagon symbol)
+              </div>
+              <div className="country-item">
+                <span className="yellow legend-tile"></span>
+                <strong>Arch Aries</strong> — Yellow flag (mountain symbol)
+              </div>
+              <div className="country-item">
+                <span className="purple legend-tile"></span>
+                <strong>Ejara</strong> — Purple flag
+              </div>
+              <div className="country-item">
+                <span className="orange legend-tile"></span>
+                <strong>Corarica</strong> — Orange flag (square symbol)
+              </div>
+              <div className="country-item">
+                <span className="white legend-tile"></span>
+                <strong>Mora Jai</strong> — White flag
+              </div>
+              <div className="country-item">
+                <span className="pink legend-tile"></span>
+                <strong>Verra</strong> — Pink flag
+              </div>
+              <div className="country-item">
+                <span className="green legend-tile"></span>
+                <strong>Nuance</strong> — Green flag
+              </div>
+            </div>
+            <p className="spoiler-note">
+              <strong>How to solve:</strong> Look at the symbols in the corners of your puzzle box. 
+              Each symbol represents a country. Get all four corners to match that country's flag color, 
+              then click the corners to complete the puzzle.
+            </p>
+          </div>
+        </details>
       </div>
     </div>
   )

@@ -157,3 +157,76 @@
   margin-right: 8px;
   vertical-align: middle;
 }
+
+.spoiler-section {
+  margin-top: 2rem;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  background: #f9f9f9;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.spoiler-toggle {
+  padding: 1rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.spoiler-toggle:hover {
+  background: linear-gradient(135deg, #ff5252, #26c6da);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.spoiler-content {
+  padding: 1rem;
+  border-top: 1px solid #ddd;
+  text-align: left;
+}
+
+.spoiler-content h3 {
+  margin-top: 0;
+  color: #333;
+  text-align: center;
+}
+
+.countries-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+
+.country-item {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #eee;
+  transition: all 0.2s ease;
+}
+
+.country-item:hover {
+  border-color: #ccc;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.spoiler-note {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: #e8f4fd;
+  border-left: 4px solid #2196f3;
+  border-radius: 4px;
+  font-size: 0.95rem;
+}
