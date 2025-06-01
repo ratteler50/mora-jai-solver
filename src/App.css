@@ -674,3 +674,126 @@
   border-left: 3px solid #4caf50;
   color: #333;
 }
+
+/* Tile highlighting for walkthrough */
+.tile.highlighted {
+  border-color: #ff4444 !important;
+  border-width: 4px !important;
+  box-shadow: 0 0 15px rgba(255, 68, 68, 0.7);
+  animation: highlightPulse 1s ease-in-out infinite alternate;
+  transform: scale(1.1) !important;
+}
+
+@keyframes highlightPulse {
+  from {
+    box-shadow: 0 0 15px rgba(255, 68, 68, 0.7);
+  }
+  to {
+    box-shadow: 0 0 25px rgba(255, 68, 68, 0.9);
+  }
+}
+
+/* Step navigation controls */
+.step-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1rem 0;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.step-button {
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  border: 2px solid #2196f3;
+  border-radius: 6px;
+  background: #e3f2fd;
+  color: #1976d2;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.step-button:hover:not(:disabled) {
+  background: #2196f3;
+  color: white;
+}
+
+.step-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  border-color: #ccc;
+  background: #f5f5f5;
+  color: #999;
+}
+
+.step-indicator {
+  font-weight: bold;
+  color: #333;
+  font-size: 0.9rem;
+  background: #f0f8ff;
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  border: 1px solid #e0e8ff;
+}
+
+/* Current step highlighting in moves list */
+.current-step-item {
+  background: #fff3cd !important;
+  border-left-color: #ff9800 !important;
+  font-weight: bold;
+}
+
+/* Current step display */
+.current-step {
+  margin: 1rem 0;
+  padding: 0.75rem;
+  background: #e8f5e8;
+  border: 2px solid #4caf50;
+  border-radius: 8px;
+}
+
+.current-step h6 {
+  margin: 0 0 0.5rem 0;
+  color: #2e7d32;
+  font-size: 1rem;
+}
+
+.highlighted-move {
+  margin: 0;
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: #1b5e20;
+}
+
+/* State preview grid */
+.state-preview {
+  margin: 1rem 0;
+  padding: 0.75rem;
+  background: #f0f8ff;
+  border: 2px solid #2196f3;
+  border-radius: 8px;
+}
+
+.state-preview h6 {
+  margin: 0 0 0.75rem 0;
+  color: #1976d2;
+  font-size: 1rem;
+  text-align: center;
+}
+
+.preview-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 30px);
+  grid-template-rows: repeat(3, 30px);
+  gap: 2px;
+  margin: 0 auto;
+  width: fit-content;
+}
+
+.preview-tile {
+  width: 30px;
+  height: 30px;
+  border: 1px solid #333;
+  border-radius: 3px;
+}

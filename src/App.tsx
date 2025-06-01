@@ -36,6 +36,7 @@ interface SolverState {
   isRunning: boolean
   result: SolverResult | null
   showSolution: boolean
+  currentStep: number
 }
 
 function App() {
@@ -52,7 +53,8 @@ function App() {
   const [solverState, setSolverState] = useState<SolverState>({
     isRunning: false,
     result: null,
-    showSolution: false
+    showSolution: false,
+    currentStep: -1
   })
   const [initialPuzzleState, setInitialPuzzleState] = useState<PuzzleState>({
     grid: defaultGrid,
@@ -159,7 +161,8 @@ function App() {
     setSolverState({
       isRunning: false,
       result: null,
-      showSolution: false
+      showSolution: false,
+      currentStep: -1
     })
   }
 
@@ -167,7 +170,8 @@ function App() {
     setSolverState({
       isRunning: true,
       result: null,
-      showSolution: false
+      showSolution: false,
+      currentStep: -1
     })
 
     // Run solver in next tick to allow UI to update
@@ -176,7 +180,8 @@ function App() {
       setSolverState({
         isRunning: false,
         result: result,
-        showSolution: true
+        showSolution: true,
+        currentStep: -1
       })
     }, 50)
   }
@@ -184,12 +189,53 @@ function App() {
   const handleToggleSolution = () => {
     setSolverState({
       ...solverState,
-      showSolution: !solverState.showSolution
+      showSolution: !solverState.showSolution,
+      currentStep: -1
+    })
+  }
+
+  const handleStepNext = () => {
+    if (solverState.result && solverState.result.solved) {
+      const maxStep = solverState.result.moves.length - 1
+      setSolverState({
+        ...solverState,
+        currentStep: Math.min(solverState.currentStep + 1, maxStep)
+      })
+    }
+  }
+
+  const handleStepPrev = () => {
+    setSolverState({
+      ...solverState,
+      currentStep: Math.max(solverState.currentStep - 1, -1)
+    })
+  }
+
+  const handleStepReset = () => {
+    setSolverState({
+      ...solverState,
+      currentStep: -1
     })
   }
 
   const checkWinCondition = (): boolean => {
     return mode === 'play' && puzzleState.corners.every(corner => corner === puzzleState.targetColor)
+  }
+
+  const shouldHighlightTile = (row: number, col: number): boolean => {
+    if (!solverState.result || !solverState.result.solved || solverState.currentStep < 0) {
+      return false
+    }
+    const currentMove = solverState.result.moves[solverState.currentStep]
+    return currentMove && currentMove.row === row && currentMove.col === col
+  }
+
+  const getCurrentStepState = (): PuzzleState => {
+    if (!solverState.result || !solverState.result.solved || solverState.currentStep < 0) {
+      return puzzleState
+    }
+    // Return the state after the current step (currentStep + 1 because states[0] is initial state)
+    return solverState.result.states[solverState.currentStep + 1] || puzzleState
   }
 
   const isWinning = checkWinCondition()
@@ -325,7 +371,7 @@ function App() {
                     row.map((color, colIndex) => (
                         <div
                             key={`${rowIndex}-${colIndex}`}
-                            className={`tile ${color} ${mode === 'setup' ? 'setup-mode' : ''}`}
+                            className={`tile ${color} ${mode === 'setup' ? 'setup-mode' : ''} ${shouldHighlightTile(rowIndex, colIndex) ? 'highlighted' : ''}`}
                             onClick={() => handleTileClick(rowIndex, colIndex)}
                         >
                         </div>
@@ -403,9 +449,72 @@ function App() {
                     
                     <div className="moves-list">
                       <h5>Move Sequence:</h5>
+                      
+                      {/* Step Navigation Controls */}
+                      <div className="step-controls">
+                        <button 
+                          className="step-button"
+                          onClick={handleStepReset}
+                          disabled={solverState.currentStep === -1}
+                        >
+                          ⏮️ Reset
+                        </button>
+                        <button 
+                          className="step-button"
+                          onClick={handleStepPrev}
+                          disabled={solverState.currentStep <= -1}
+                        >
+                          ⬅️ Prev
+                        </button>
+                        <span className="step-indicator">
+                          Step {solverState.currentStep + 1} of {solverState.result.moves.length}
+                          {solverState.currentStep === -1 && " (Initial)"}
+                        </span>
+                        <button 
+                          className="step-button"
+                          onClick={handleStepNext}
+                          disabled={solverState.currentStep >= solverState.result.moves.length - 1}
+                        >
+                          Next ➡️
+                        </button>
+                      </div>
+
+                      {/* Current Step Highlight */}
+                      {solverState.currentStep >= 0 && (
+                        <div className="current-step">
+                          <h6>Current Move:</h6>
+                          <p className="highlighted-move">
+                            {formatMoves(solverState.result.moves, solverState.result.states)[solverState.currentStep]}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Expected State Preview */}
+                      {solverState.currentStep >= 0 && (
+                        <div className="state-preview">
+                          <h6>Expected State After Step {solverState.currentStep + 1}:</h6>
+                          <div className="preview-grid">
+                            {getCurrentStepState().grid.map((row, rowIndex) =>
+                              row.map((color, colIndex) => (
+                                <div
+                                  key={`preview-${rowIndex}-${colIndex}`}
+                                  className={`preview-tile ${color}`}
+                                >
+                                </div>
+                              ))
+                            )}
+                          </div>
+                        </div>
+                      )}
+                      
                       <ol>
                         {formatMoves(solverState.result.moves, solverState.result.states).map((move, index) => (
-                          <li key={index}>{move}</li>
+                          <li 
+                            key={index}
+                            className={index === solverState.currentStep ? 'current-step-item' : ''}
+                          >
+                            {move}
+                          </li>
                         ))}
                       </ol>
                     </div>
