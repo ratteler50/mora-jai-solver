@@ -1,10 +1,38 @@
 # Mora Jai Box Solver
 
-A React TypeScript application that simulates the puzzle mechanics from the Blue Prince game. The app allows users to interact with a 3x3 grid of colored tiles, each with different behaviors when clicked, with the goal of getting all four corners to be the same target color.
+A React TypeScript application that simulates the puzzle mechanics from the Blue Prince game. The app features dual-mode functionality with setup and play modes, an intelligent automatic solver, and an optimized three-column layout for efficient puzzle solving.
 
 ## 🎮 Live Demo
 
 **[Play the game here!](https://ratteler50.github.io/mora-jai-solver/)**
+
+## ✨ Features
+
+### 🎨 **Setup Mode**
+- Paint tiles with a brush tool using any of the 10 tile colors
+- Select target corner color from authentic Blue Prince country symbols
+- Visual country symbol selector with real game images
+- Configure custom puzzle scenarios
+
+### 🎯 **Play Mode**  
+- Interactive 3x3 puzzle grid with tile click mechanics
+- Real-time corner tracking and win condition detection
+- Reset functionality to return to initial puzzle state
+- Celebration animations when puzzle is solved
+
+### 🧠 **Automatic Solver**
+- Advanced BFS (Breadth-First Search) algorithm finds optimal solutions
+- Performance optimized with state exploration limits
+- User-friendly move descriptions ("Click red tile at Top Left")
+- Solution statistics (moves, time, states explored)
+- Solvability analysis for impossible puzzles
+
+### 📱 **Optimized Layout**
+- **Three-column responsive design** for efficient space utilization
+- **Left Panel**: Interactive puzzle and controls
+- **Center Panel**: Solution display and tile behavior reference  
+- **Right Panel**: Country symbols reference
+- **Mobile-friendly**: Automatically adapts to single-column on smaller screens
 
 ## 🧩 Game Mechanics
 
@@ -21,7 +49,7 @@ The puzzle features a 3x3 grid where each tile has different behaviors when clic
 - **White tiles** — Expand to adjacent gray tiles, or turn gray if no adjacent gray tiles
 - **Blue tiles** — Copy the behavior of the center tile (position 1,1)
 
-**Objective**: Get all four corner tiles to match the target color shown at the top.
+**Objective**: Get all four corner tiles to match the target color. Each country symbol from Blue Prince corresponds to a specific target color.
 
 ## 🚀 Development
 
@@ -56,17 +84,42 @@ The app automatically deploys to GitHub Pages when changes are pushed to the `ma
 
 ## 🏗️ Architecture
 
-- **Single Component Design**: Main logic in `src/App.tsx`
-- **State Management**: Simple React state with `PuzzleState` interface
-- **Responsive Design**: CSS Grid layout that works on mobile and desktop
-- **No External Dependencies**: Pure React/TypeScript implementation
+### **Dual-Mode System**
+- **Setup Mode**: Tile painting and puzzle configuration
+- **Play Mode**: Interactive puzzle solving with solver integration
+- Mode-specific UI controls and behaviors
+
+### **Automatic Solver**
+- **BFS Algorithm**: Guarantees optimal (shortest) solutions
+- **State Management**: Efficient state tracking and duplicate detection
+- **Performance Limits**: 50,000 state exploration cap prevents infinite loops
+- **User-Friendly Output**: Human-readable move descriptions with position names
+
+### **Responsive Layout**
+- **Three-Column Grid**: Optimized for laptop/desktop screens
+- **Mobile Adaptation**: Single-column layout for smaller screens
+- **Component Organization**: Logical grouping of related UI elements
+
+### **State Management**
+- **PuzzleState Interface**: Grid, corners, and target color tracking
+- **SetupState Interface**: Brush color selection for painting mode
+- **SolverState Interface**: Solution results and display control
+
+### **Testing**
+- **Comprehensive Test Suite**: 44 unit tests covering all tile behaviors
+- **Solver Testing**: Edge cases, performance limits, and bug regression tests
+- **Vitest Framework**: Fast and reliable test execution
 
 ## 📁 Project Structure
 
 ```
 src/
-├── App.tsx          # Main component with puzzle logic
-├── App.css          # Styling for grid, tiles, and UI
-├── main.tsx         # React entry point
-└── index.css        # Global styles
+├── App.tsx              # Main component with dual-mode logic and UI
+├── App.css              # Three-column layout and responsive styling
+├── tileLogic.ts         # Individual tile behavior implementations
+├── tileLogic.test.ts    # Unit tests for all tile behaviors
+├── solver.ts            # BFS algorithm and solution formatting
+├── solver.test.ts       # Solver tests including edge cases
+├── main.tsx             # React entry point
+└── index.css            # Global styles
 ```

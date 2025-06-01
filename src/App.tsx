@@ -309,330 +309,341 @@ function App() {
           </div>
         )}
 
-        <div className={`puzzle-container ${isWinning ? 'winning' : ''}`}>
-          <div className="corner top-left" onClick={mode === 'play' ? handleResetToInitial : undefined}>
-            <div className={`corner-tile ${puzzleState.corners[0]} ${isWinning ? 'winning' : ''}`}></div>
-          </div>
-          <div className="corner top-right" onClick={mode === 'play' ? handleResetToInitial : undefined}>
-            <div className={`corner-tile ${puzzleState.corners[1]} ${isWinning ? 'winning' : ''}`}></div>
-          </div>
+        <div className="main-layout">
+          {/* Left Panel - Main Puzzle */}
+          <div className="left-panel">
+            <div className={`puzzle-container ${isWinning ? 'winning' : ''}`}>
+              <div className="corner top-left" onClick={mode === 'play' ? handleResetToInitial : undefined}>
+                <div className={`corner-tile ${puzzleState.corners[0]} ${isWinning ? 'winning' : ''}`}></div>
+              </div>
+              <div className="corner top-right" onClick={mode === 'play' ? handleResetToInitial : undefined}>
+                <div className={`corner-tile ${puzzleState.corners[1]} ${isWinning ? 'winning' : ''}`}></div>
+              </div>
 
-          <div className="grid">
-            {puzzleState.grid.map((row, rowIndex) =>
-                row.map((color, colIndex) => (
-                    <div
-                        key={`${rowIndex}-${colIndex}`}
-                        className={`tile ${color} ${mode === 'setup' ? 'setup-mode' : ''}`}
-                        onClick={() => handleTileClick(rowIndex, colIndex)}
-                    >
-                    </div>
-                ))
-            )}
-          </div>
-
-          <div className="corner bottom-left"
-               onClick={mode === 'play' ? handleResetToInitial : undefined}>
-            <div className={`corner-tile ${puzzleState.corners[2]} ${isWinning ? 'winning' : ''}`}></div>
-          </div>
-          <div className="corner bottom-right"
-               onClick={mode === 'play' ? handleResetToInitial : undefined}>
-            <div className={`corner-tile ${puzzleState.corners[3]} ${isWinning ? 'winning' : ''}`}></div>
-          </div>
-        </div>
-
-        <div className="info">
-          {isWinning && (
-            <div className="win-message">
-              <h2>🎉 Puzzle Solved! 🎉</h2>
-              <p>All corners match the target color!</p>
-            </div>
-          )}
-          
-          <p>Target: Get all corners to be <span
-              className={puzzleState.targetColor}>{puzzleState.targetColor}</span>
-          </p>
-          
-          {mode === 'setup' ? (
-            <div>
-              <p>🎨 Setup Mode: Configure your puzzle</p>
-              <p>Select a brush color and click tiles to paint them</p>
-              <p>Choose your target color, then switch to Play Mode</p>
-            </div>
-          ) : (
-            <div>
-              <p>🎮 Play Mode: Solve the puzzle</p>
-              <p>Click tiles to activate their behaviors</p>
-              <p>Click corners to reset to initial state</p>
-              
-              <div className="solver-section">
-                <button 
-                  className="solver-button"
-                  onClick={handleSolvePuzzle}
-                  disabled={solverState.isRunning || isWinning}
-                >
-                  {solverState.isRunning ? '🤔 Solving...' : '🧠 Auto-Solve'}
-                </button>
-                
-                {solverState.result && (
-                  <button 
-                    className="solver-toggle"
-                    onClick={handleToggleSolution}
-                  >
-                    {solverState.showSolution ? '📄 Hide Solution' : '📋 Show Solution'}
-                  </button>
+              <div className="grid">
+                {puzzleState.grid.map((row, rowIndex) =>
+                    row.map((color, colIndex) => (
+                        <div
+                            key={`${rowIndex}-${colIndex}`}
+                            className={`tile ${color} ${mode === 'setup' ? 'setup-mode' : ''}`}
+                            onClick={() => handleTileClick(rowIndex, colIndex)}
+                        >
+                        </div>
+                    ))
                 )}
               </div>
+
+              <div className="corner bottom-left"
+                   onClick={mode === 'play' ? handleResetToInitial : undefined}>
+                <div className={`corner-tile ${puzzleState.corners[2]} ${isWinning ? 'winning' : ''}`}></div>
+              </div>
+              <div className="corner bottom-right"
+                   onClick={mode === 'play' ? handleResetToInitial : undefined}>
+                <div className={`corner-tile ${puzzleState.corners[3]} ${isWinning ? 'winning' : ''}`}></div>
+              </div>
+            </div>
+
+            <div className="info">
+              {isWinning && (
+                <div className="win-message">
+                  <h2>🎉 Puzzle Solved! 🎉</h2>
+                  <p>All corners match the target color!</p>
+                </div>
+              )}
               
-              {solverState.showSolution && solverState.result && (
-                <div className="solution-display">
-                  {solverState.result.solved ? (
-                    <div>
-                      <h4>✅ Solution Found!</h4>
-                      <p><strong>Moves:</strong> {solverState.result.moves.length}</p>
-                      <p><strong>Time:</strong> {solverState.result.timeMs.toFixed(1)}ms</p>
-                      <p><strong>States explored:</strong> {solverState.result.totalStatesExplored.toLocaleString()}</p>
-                      
-                      <div className="moves-list">
-                        <h5>Move Sequence:</h5>
-                        <ol>
-                          {formatMoves(solverState.result.moves, solverState.result.states).map((move, index) => (
-                            <li key={index}>{move}</li>
-                          ))}
-                        </ol>
-                      </div>
-                    </div>
-                  ) : (
-                    <div>
-                      <h4>❌ No Solution Found</h4>
-                      <p>Explored {solverState.result.totalStatesExplored.toLocaleString()} states in {solverState.result.timeMs.toFixed(1)}ms</p>
-                      {(() => {
-                        const estimate = estimateSolvability(puzzleState)
-                        const hitLimit = solverState.result.totalStatesExplored >= 50000
-                        
-                        if (hitLimit) {
-                          return (
-                            <p><strong>Analysis:</strong> Search limit reached - puzzle may be too complex or unsolvable</p>
-                          )
-                        } else if (!estimate.likely) {
-                          return (
-                            <p><strong>Analysis:</strong> {estimate.reason}</p>
-                          )
-                        } else {
-                          return (
-                            <p><strong>Analysis:</strong> Puzzle appears unsolvable with current configuration</p>
-                          )
-                        }
-                      })()}
-                    </div>
-                  )}
+              <p>Target: Get all corners to be <span
+                  className={puzzleState.targetColor}>{puzzleState.targetColor}</span>
+              </p>
+              
+              {mode === 'setup' ? (
+                <div>
+                  <p>🎨 Setup Mode: Configure your puzzle</p>
+                  <p>Select a brush color and click tiles to paint them</p>
+                  <p>Choose your target color, then switch to Play Mode</p>
+                </div>
+              ) : (
+                <div>
+                  <p>🎮 Play Mode: Solve the puzzle</p>
+                  <p>Click tiles to activate their behaviors</p>
+                  <p>Click corners to reset to initial state</p>
+                  
+                  <div className="solver-section">
+                    <button 
+                      className="solver-button"
+                      onClick={handleSolvePuzzle}
+                      disabled={solverState.isRunning || isWinning}
+                    >
+                      {solverState.isRunning ? '🤔 Solving...' : '🧠 Auto-Solve'}
+                    </button>
+                    
+                    {solverState.result && (
+                      <button 
+                        className="solver-toggle"
+                        onClick={handleToggleSolution}
+                      >
+                        {solverState.showSolution ? '📄 Hide Solution' : '📋 Show Solution'}
+                      </button>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
-          )}
+          </div>
 
-          <details className="spoiler-section">
-            <summary className="spoiler-toggle">Tile Behaviors</summary>
-            <div className="spoiler-content">
-              <h3>How Each Tile Works:</h3>
-              <div className="behaviors-grid">
-                <div className="behavior-item">
-                  <span className="white behavior-tile"></span>
-                  <div className="behavior-info">
-                    <strong>White</strong>
-                    <small>Expands to adjacent gray or turns gray</small>
+          {/* Center Panel - Solution Display and Tile Behaviors */}
+          <div className="center-panel">
+            {mode === 'play' && solverState.showSolution && solverState.result && (
+              <div className="solution-display">
+                {solverState.result.solved ? (
+                  <div>
+                    <h4>✅ Solution Found!</h4>
+                    <p><strong>Moves:</strong> {solverState.result.moves.length}</p>
+                    <p><strong>Time:</strong> {solverState.result.timeMs.toFixed(1)}ms</p>
+                    <p><strong>States explored:</strong> {solverState.result.totalStatesExplored.toLocaleString()}</p>
+                    
+                    <div className="moves-list">
+                      <h5>Move Sequence:</h5>
+                      <ol>
+                        {formatMoves(solverState.result.moves, solverState.result.states).map((move, index) => (
+                          <li key={index}>{move}</li>
+                        ))}
+                      </ol>
+                    </div>
                   </div>
-                </div>
-                <div className="behavior-item">
-                  <span className="black behavior-tile"></span>
-                  <div className="behavior-info">
-                    <strong>Black</strong>
-                    <small>Moves row tiles right</small>
+                ) : (
+                  <div>
+                    <h4>❌ No Solution Found</h4>
+                    <p>Explored {solverState.result.totalStatesExplored.toLocaleString()} states in {solverState.result.timeMs.toFixed(1)}ms</p>
+                    {(() => {
+                      const estimate = estimateSolvability(puzzleState)
+                      const hitLimit = solverState.result.totalStatesExplored >= 50000
+                      
+                      if (hitLimit) {
+                        return (
+                          <p><strong>Analysis:</strong> Search limit reached - puzzle may be too complex or unsolvable</p>
+                        )
+                      } else if (!estimate.likely) {
+                        return (
+                          <p><strong>Analysis:</strong> {estimate.reason}</p>
+                        )
+                      } else {
+                        return (
+                          <p><strong>Analysis:</strong> Puzzle appears unsolvable with current configuration</p>
+                        )
+                      }
+                    })()}
                   </div>
-                </div>
-                <div className="behavior-item">
-                  <span className="red behavior-tile"></span>
-                  <div className="behavior-info">
-                    <strong>Red</strong>
-                    <small>White→Black, Black→Red</small>
+                )}
+              </div>
+            )}
+            
+            <details className="spoiler-section">
+              <summary className="spoiler-toggle">Tile Behaviors</summary>
+              <div className="spoiler-content">
+                <h3>How Each Tile Works:</h3>
+                <div className="behaviors-grid">
+                  <div className="behavior-item">
+                    <span className="white behavior-tile"></span>
+                    <div className="behavior-info">
+                      <strong>White</strong>
+                      <small>Expands to adjacent gray or turns gray</small>
+                    </div>
                   </div>
-                </div>
-                <div className="behavior-item">
-                  <span className="yellow behavior-tile"></span>
-                  <div className="behavior-info">
-                    <strong>Yellow</strong>
-                    <small>Moves up one position</small>
+                  <div className="behavior-item">
+                    <span className="black behavior-tile"></span>
+                    <div className="behavior-info">
+                      <strong>Black</strong>
+                      <small>Moves row tiles right</small>
+                    </div>
                   </div>
-                </div>
-                <div className="behavior-item">
-                  <span className="purple behavior-tile"></span>
-                  <div className="behavior-info">
-                    <strong>Purple</strong>
-                    <small>Moves down one position</small>
+                  <div className="behavior-item">
+                    <span className="red behavior-tile"></span>
+                    <div className="behavior-info">
+                      <strong>Red</strong>
+                      <small>White→Black, Black→Red</small>
+                    </div>
                   </div>
-                </div>
-                <div className="behavior-item">
-                  <span className="green behavior-tile"></span>
-                  <div className="behavior-info">
-                    <strong>Green</strong>
-                    <small>Swaps with mirrored position</small>
+                  <div className="behavior-item">
+                    <span className="yellow behavior-tile"></span>
+                    <div className="behavior-info">
+                      <strong>Yellow</strong>
+                      <small>Moves up one position</small>
+                    </div>
                   </div>
-                </div>
-                <div className="behavior-item">
-                  <span className="pink behavior-tile"></span>
-                  <div className="behavior-info">
-                    <strong>Pink</strong>
-                    <small>Rotates adjacent tiles clockwise</small>
+                  <div className="behavior-item">
+                    <span className="purple behavior-tile"></span>
+                    <div className="behavior-info">
+                      <strong>Purple</strong>
+                      <small>Moves down one position</small>
+                    </div>
                   </div>
-                </div>
-                <div className="behavior-item">
-                  <span className="orange behavior-tile"></span>
-                  <div className="behavior-info">
-                    <strong>Orange</strong>
-                    <small>Matches majority adjacent color</small>
+                  <div className="behavior-item">
+                    <span className="green behavior-tile"></span>
+                    <div className="behavior-info">
+                      <strong>Green</strong>
+                      <small>Swaps with mirrored position</small>
+                    </div>
                   </div>
-                </div>
-                <div className="behavior-item">
-                  <span className="blue behavior-tile"></span>
-                  <div className="behavior-info">
-                    <strong>Blue</strong>
-                    <small>Copies center tile behavior</small>
+                  <div className="behavior-item">
+                    <span className="pink behavior-tile"></span>
+                    <div className="behavior-info">
+                      <strong>Pink</strong>
+                      <small>Rotates adjacent tiles clockwise</small>
+                    </div>
                   </div>
-                </div>
-                <div className="behavior-item">
-                  <span className="gray behavior-tile"></span>
-                  <div className="behavior-info">
-                    <strong>Gray</strong>
-                    <small>No function (empty space)</small>
+                  <div className="behavior-item">
+                    <span className="orange behavior-tile"></span>
+                    <div className="behavior-info">
+                      <strong>Orange</strong>
+                      <small>Matches majority adjacent color</small>
+                    </div>
+                  </div>
+                  <div className="behavior-item">
+                    <span className="blue behavior-tile"></span>
+                    <div className="behavior-info">
+                      <strong>Blue</strong>
+                      <small>Copies center tile behavior</small>
+                    </div>
+                  </div>
+                  <div className="behavior-item">
+                    <span className="gray behavior-tile"></span>
+                    <div className="behavior-info">
+                      <strong>Gray</strong>
+                      <small>No function (empty space)</small>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </details>
+            </details>
+          </div>
 
-          <details className="spoiler-section">
-            <summary className="spoiler-toggle">Country Symbols</summary>
-            <div className="spoiler-content">
-              <h3>Country Symbols & Target Colors:</h3>
-              <div className="countries-grid">
-                <div className="country-item">
-                  <img
-                      src="https://static0.gamerantimages.com/wordpress/wp-content/uploads/2025/05/blue-prince-country-symbols-mora-jai.jpg"
-                      alt="Mora Jai symbol"
-                      className="country-symbol-img"
-                  />
-                  <div className="country-info">
-                    <strong>Mora Jai</strong>
-                    <span className="white legend-tile"></span>
-                    <small>White Arch</small>
+          {/* Right Panel - Country Symbols */}
+          <div className="right-panel">
+            <details className="spoiler-section">
+              <summary className="spoiler-toggle">Country Symbols</summary>
+              <div className="spoiler-content">
+                <h3>Country Symbols & Target Colors:</h3>
+                <div className="countries-grid">
+                  <div className="country-item">
+                    <img
+                        src="https://static0.gamerantimages.com/wordpress/wp-content/uploads/2025/05/blue-prince-country-symbols-mora-jai.jpg"
+                        alt="Mora Jai symbol"
+                        className="country-symbol-img"
+                    />
+                    <div className="country-info">
+                      <strong>Mora Jai</strong>
+                      <span className="white legend-tile"></span>
+                      <small>White Arch</small>
+                    </div>
+                  </div>
+                  <div className="country-item">
+                    <img
+                        src="https://static0.gamerantimages.com/wordpress/wp-content/uploads/2025/05/blue-prince-country-symbols-orinda-aries.jpg"
+                        alt="Orinda Aries symbol"
+                        className="country-symbol-img"
+                    />
+                    <div className="country-info">
+                      <strong>Orinda Aries</strong>
+                      <span className="black legend-tile"></span>
+                      <small>Black Mirror</small>
+                    </div>
+                  </div>
+                  <div className="country-item">
+                    <img
+                        src="https://static0.gamerantimages.com/wordpress/wp-content/uploads/2025/05/blue-prince-country-symbols-fenn-aries.jpg"
+                        alt="Fenn Aries symbol"
+                        className="country-symbol-img"
+                    />
+                    <div className="country-info">
+                      <strong>Fenn Aries</strong>
+                      <span className="red legend-tile"></span>
+                      <small>Red Pentagon</small>
+                    </div>
+                  </div>
+                  <div className="country-item">
+                    <img
+                        src="https://static0.gamerantimages.com/wordpress/wp-content/uploads/2025/05/blue-prince-country-symbols-arch-aries.jpg"
+                        alt="Arch Aries symbol"
+                        className="country-symbol-img"
+                    />
+                    <div className="country-info">
+                      <strong>Arch Aries</strong>
+                      <span className="yellow legend-tile"></span>
+                      <small>Yellow Mountain</small>
+                    </div>
+                  </div>
+                  <div className="country-item">
+                    <img
+                        src="https://static0.gamerantimages.com/wordpress/wp-content/uploads/2025/05/blue-prince-country-symbols-eraja.jpg"
+                        alt="Ejara symbol"
+                        className="country-symbol-img"
+                    />
+                    <div className="country-info">
+                      <strong>Ejara</strong>
+                      <span className="purple legend-tile"></span>
+                      <small>Purple Hourglass</small>
+                    </div>
+                  </div>
+                  <div className="country-item">
+                    <img
+                        src="https://static0.gamerantimages.com/wordpress/wp-content/uploads/2025/05/blue-prince-country-symbols-nuance.jpg"
+                        alt="Nuance symbol"
+                        className="country-symbol-img"
+                    />
+                    <div className="country-info">
+                      <strong>Nuance</strong>
+                      <span className="green legend-tile"></span>
+                      <small>Green Diamond</small>
+                    </div>
+                  </div>
+                  <div className="country-item">
+                    <img
+                        src="https://static0.gamerantimages.com/wordpress/wp-content/uploads/2025/05/blue-prince-country-symbols-verra.jpg"
+                        alt="Verra symbol"
+                        className="country-symbol-img"
+                    />
+                    <div className="country-info">
+                      <strong>Verra</strong>
+                      <span className="pink legend-tile"></span>
+                      <small>Pink Jigsaw</small>
+                    </div>
+                  </div>
+                  <div className="country-item">
+                    <img
+                        src="https://static0.gamerantimages.com/wordpress/wp-content/uploads/2025/05/blue-prince-country-symbols-corarica.jpg"
+                        alt="Corarica symbol"
+                        className="country-symbol-img"
+                    />
+                    <div className="country-info">
+                      <strong>Corarica</strong>
+                      <span className="orange legend-tile"></span>
+                      <small>Orange Chevron</small>
+                    </div>
+                  </div>
+                  <div className="country-item">
+                    <img
+                        src="/mora-jai-solver/images/corner-symbols/mount_holly.png"
+                        alt="Mount Holly symbol"
+                        className="country-symbol-img"
+                    />
+                    <div className="country-info">
+                      <strong>Mt Holly</strong>
+                      <span className="blue legend-tile"></span>
+                      <small>Blue Throne</small>
+                    </div>
                   </div>
                 </div>
-                <div className="country-item">
-                  <img
-                      src="https://static0.gamerantimages.com/wordpress/wp-content/uploads/2025/05/blue-prince-country-symbols-orinda-aries.jpg"
-                      alt="Orinda Aries symbol"
-                      className="country-symbol-img"
-                  />
-                  <div className="country-info">
-                    <strong>Orinda Aries</strong>
-                    <span className="black legend-tile"></span>
-                    <small>Black Mirror</small>
-                  </div>
-                </div>
-                <div className="country-item">
-                  <img
-                      src="https://static0.gamerantimages.com/wordpress/wp-content/uploads/2025/05/blue-prince-country-symbols-fenn-aries.jpg"
-                      alt="Fenn Aries symbol"
-                      className="country-symbol-img"
-                  />
-                  <div className="country-info">
-                    <strong>Fenn Aries</strong>
-                    <span className="red legend-tile"></span>
-                    <small>Red Pentagon</small>
-                  </div>
-                </div>
-                <div className="country-item">
-                  <img
-                      src="https://static0.gamerantimages.com/wordpress/wp-content/uploads/2025/05/blue-prince-country-symbols-arch-aries.jpg"
-                      alt="Arch Aries symbol"
-                      className="country-symbol-img"
-                  />
-                  <div className="country-info">
-                    <strong>Arch Aries</strong>
-                    <span className="yellow legend-tile"></span>
-                    <small>Yellow Mountain</small>
-                  </div>
-                </div>
-                <div className="country-item">
-                  <img
-                      src="https://static0.gamerantimages.com/wordpress/wp-content/uploads/2025/05/blue-prince-country-symbols-eraja.jpg"
-                      alt="Ejara symbol"
-                      className="country-symbol-img"
-                  />
-                  <div className="country-info">
-                    <strong>Ejara</strong>
-                    <span className="purple legend-tile"></span>
-                    <small>Purple Hourglass</small>
-                  </div>
-                </div>
-                <div className="country-item">
-                  <img
-                      src="https://static0.gamerantimages.com/wordpress/wp-content/uploads/2025/05/blue-prince-country-symbols-nuance.jpg"
-                      alt="Nuance symbol"
-                      className="country-symbol-img"
-                  />
-                  <div className="country-info">
-                    <strong>Nuance</strong>
-                    <span className="green legend-tile"></span>
-                    <small>Green Diamond</small>
-                  </div>
-                </div>
-                <div className="country-item">
-                  <img
-                      src="https://static0.gamerantimages.com/wordpress/wp-content/uploads/2025/05/blue-prince-country-symbols-verra.jpg"
-                      alt="Verra symbol"
-                      className="country-symbol-img"
-                  />
-                  <div className="country-info">
-                    <strong>Verra</strong>
-                    <span className="pink legend-tile"></span>
-                    <small>Pink Jigsaw</small>
-                  </div>
-                </div>
-                <div className="country-item">
-                  <img
-                      src="https://static0.gamerantimages.com/wordpress/wp-content/uploads/2025/05/blue-prince-country-symbols-corarica.jpg"
-                      alt="Corarica symbol"
-                      className="country-symbol-img"
-                  />
-                  <div className="country-info">
-                    <strong>Corarica</strong>
-                    <span className="orange legend-tile"></span>
-                    <small>Orange Chevron</small>
-                  </div>
-                </div>
-                <div className="country-item">
-                  <img
-                      src="/mora-jai-solver/images/corner-symbols/mount_holly.png"
-                      alt="Mount Holly symbol"
-                      className="country-symbol-img"
-                  />
-                  <div className="country-info">
-                    <strong>Mt Holly</strong>
-                    <span className="blue legend-tile"></span>
-                    <small>Blue Throne</small>
-                  </div>
-                </div>
+                <p className="spoiler-note">
+                  <strong>How to solve:</strong> Look at the symbols in the
+                  corners
+                  of your puzzle box.
+                  Each symbol represents a country. Get all four corners to match
+                  that country's flag color,
+                  then click the corners to complete the puzzle.
+                </p>
               </div>
-              <p className="spoiler-note">
-                <strong>How to solve:</strong> Look at the symbols in the
-                corners
-                of your puzzle box.
-                Each symbol represents a country. Get all four corners to match
-                that country's flag color,
-                then click the corners to complete the puzzle.
-              </p>
-            </div>
-          </details>
+            </details>
+          </div>
         </div>
       </div>
   )
