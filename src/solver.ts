@@ -209,7 +209,7 @@ export const formatMoves = (moves: Move[], states: PuzzleState[]): string[] => {
     const positionName = getPositionName(move.row, move.col)
     
     formattedMoves.push(
-      `${i + 1}. Click ${tileColor} tile at ${positionName}`
+      `${tileColor.charAt(0).toUpperCase() + tileColor.slice(1)} at ${positionName}`
     )
   }
   

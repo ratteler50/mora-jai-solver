@@ -93,8 +93,8 @@ describe('Solver Tests', () => {
     const formatted = formatMoves(moves, states)
     
     expect(formatted).toHaveLength(2)
-    expect(formatted[0]).toBe('1. Click red tile at Top Center')
-    expect(formatted[1]).toBe('2. Click blue tile at Bottom Left')
+    expect(formatted[0]).toBe('Red at Top Center')
+    expect(formatted[1]).toBe('Blue at Bottom Left')
   })
 
   test('performance limits prevent infinite loops', () => {
