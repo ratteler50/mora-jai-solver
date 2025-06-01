@@ -13,6 +13,12 @@ import {
   applyWhiteTileLogic,
   applyBlueTileLogic
 } from './tileLogic'
+import {
+  solvePuzzle,
+  formatMoves,
+  estimateSolvability,
+  type SolverResult
+} from './solver'
 
 type AppMode = 'setup' | 'play'
 
@@ -26,26 +32,37 @@ interface SetupState {
   selectedBrushColor: TileColorType
 }
 
+interface SolverState {
+  isRunning: boolean
+  result: SolverResult | null
+  showSolution: boolean
+}
+
 function App() {
   const defaultGrid = [
-    [TileColor.Pink, TileColor.Gray, TileColor.Gray],
-    [TileColor.Gray, TileColor.Yellow, TileColor.Yellow],
-    [TileColor.Gray, TileColor.Yellow, TileColor.Yellow]
+    [TileColor.Gray, TileColor.Gray, TileColor.Gray],
+    [TileColor.Gray, TileColor.Gray, TileColor.Gray],
+    [TileColor.Gray, TileColor.Gray, TileColor.Gray]
   ]
   
   const [mode, setMode] = useState<AppMode>('setup')
   const [setupState, setSetupState] = useState<SetupState>({
     selectedBrushColor: TileColor.White
   })
+  const [solverState, setSolverState] = useState<SolverState>({
+    isRunning: false,
+    result: null,
+    showSolution: false
+  })
   const [initialPuzzleState, setInitialPuzzleState] = useState<PuzzleState>({
     grid: defaultGrid,
     corners: [defaultGrid[0][0], defaultGrid[0][2], defaultGrid[2][0], defaultGrid[2][2]],
-    targetColor: TileColor.Yellow
+    targetColor: TileColor.Red
   })
   const [puzzleState, setPuzzleState] = useState<PuzzleState>({
     grid: defaultGrid,
     corners: [defaultGrid[0][0], defaultGrid[0][2], defaultGrid[2][0], defaultGrid[2][2]],
-    targetColor: TileColor.Yellow
+    targetColor: TileColor.Red
   })
 
   const handleTileClick = (row: number, col: number) => {
@@ -139,6 +156,36 @@ function App() {
 
   const handleResetToInitial = () => {
     setPuzzleState({...initialPuzzleState})
+    setSolverState({
+      isRunning: false,
+      result: null,
+      showSolution: false
+    })
+  }
+
+  const handleSolvePuzzle = async () => {
+    setSolverState({
+      isRunning: true,
+      result: null,
+      showSolution: false
+    })
+
+    // Run solver in next tick to allow UI to update
+    setTimeout(() => {
+      const result = solvePuzzle(puzzleState)
+      setSolverState({
+        isRunning: false,
+        result: result,
+        showSolution: true
+      })
+    }, 50)
+  }
+
+  const handleToggleSolution = () => {
+    setSolverState({
+      ...solverState,
+      showSolution: !solverState.showSolution
+    })
   }
 
   const checkWinCondition = (): boolean => {
@@ -316,6 +363,70 @@ function App() {
               <p>🎮 Play Mode: Solve the puzzle</p>
               <p>Click tiles to activate their behaviors</p>
               <p>Click corners to reset to initial state</p>
+              
+              <div className="solver-section">
+                <button 
+                  className="solver-button"
+                  onClick={handleSolvePuzzle}
+                  disabled={solverState.isRunning || isWinning}
+                >
+                  {solverState.isRunning ? '🤔 Solving...' : '🧠 Auto-Solve'}
+                </button>
+                
+                {solverState.result && (
+                  <button 
+                    className="solver-toggle"
+                    onClick={handleToggleSolution}
+                  >
+                    {solverState.showSolution ? '📄 Hide Solution' : '📋 Show Solution'}
+                  </button>
+                )}
+              </div>
+              
+              {solverState.showSolution && solverState.result && (
+                <div className="solution-display">
+                  {solverState.result.solved ? (
+                    <div>
+                      <h4>✅ Solution Found!</h4>
+                      <p><strong>Moves:</strong> {solverState.result.moves.length}</p>
+                      <p><strong>Time:</strong> {solverState.result.timeMs.toFixed(1)}ms</p>
+                      <p><strong>States explored:</strong> {solverState.result.totalStatesExplored.toLocaleString()}</p>
+                      
+                      <div className="moves-list">
+                        <h5>Move Sequence:</h5>
+                        <ol>
+                          {formatMoves(solverState.result.moves, solverState.result.states).map((move, index) => (
+                            <li key={index}>{move}</li>
+                          ))}
+                        </ol>
+                      </div>
+                    </div>
+                  ) : (
+                    <div>
+                      <h4>❌ No Solution Found</h4>
+                      <p>Explored {solverState.result.totalStatesExplored.toLocaleString()} states in {solverState.result.timeMs.toFixed(1)}ms</p>
+                      {(() => {
+                        const estimate = estimateSolvability(puzzleState)
+                        const hitLimit = solverState.result.totalStatesExplored >= 50000
+                        
+                        if (hitLimit) {
+                          return (
+                            <p><strong>Analysis:</strong> Search limit reached - puzzle may be too complex or unsolvable</p>
+                          )
+                        } else if (!estimate.likely) {
+                          return (
+                            <p><strong>Analysis:</strong> {estimate.reason}</p>
+                          )
+                        } else {
+                          return (
+                            <p><strong>Analysis:</strong> Puzzle appears unsolvable with current configuration</p>
+                          )
+                        }
+                      })()}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           )}
 
