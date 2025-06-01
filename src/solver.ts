@@ -139,7 +139,7 @@ export const solvePuzzle = (initialState: PuzzleState): SolverResult => {
   visited.add(gridToKey(initialState.grid))
   
   let statesExplored = 1
-  const maxStates = 50000 // Prevent infinite loops or excessive computation
+  const maxStates = 5000000 // Prevent infinite loops or excessive computation
   
   while (queue.length > 0 && statesExplored < maxStates) {
     const current = queue.shift()!
