@@ -149,19 +149,24 @@ export const applyWhiteTileLogic = (grid: TileColor[][], row: number, col: numbe
   // White tile behavior: 
   // 1. Clicked white turns gray
   // 2. Adjacent gray tiles turn white
-  // 3. All other tiles remain unchanged
+  // 3. Adjacent white tiles turn gray
+  // 4. All other tiles remain unchanged
   
   // First: Clicked white turns gray
   newGrid[row][col] = TileColor.Gray
   
-  // Second: Adjacent gray tiles turn white
+  // Second: Handle adjacent tiles
   const adjacentPositions = [
     [row - 1, col], [row + 1, col], [row, col - 1], [row, col + 1]
   ]
   
   adjacentPositions.forEach(([r, c]) => {
-    if (r >= 0 && r < 3 && c >= 0 && c < 3 && grid[r][c] === TileColor.Gray) {
-      newGrid[r][c] = TileColor.White
+    if (r >= 0 && r < 3 && c >= 0 && c < 3) {
+      if (grid[r][c] === TileColor.Gray) {
+        newGrid[r][c] = TileColor.White
+      } else if (grid[r][c] === TileColor.White) {
+        newGrid[r][c] = TileColor.Gray
+      }
     }
   })
   
@@ -192,18 +197,22 @@ export const applyBlueTileLogic = (grid: TileColor[][], row: number, col: number
     case TileColor.Orange:
       return applyOrangeTileLogic(newGrid, row, col)
     case TileColor.White: {
-      // Blue copying white behavior: same as white tile logic
+      // Blue copying white behavior: only affects blue tile and adjacent grays
       // 1. Blue tile (acting as white) turns gray
       newGrid[row][col] = TileColor.Gray
       
-      // 2. Adjacent gray tiles turn white (other colors unchanged)
+      // 2. Adjacent gray tiles turn blue (only grays, whites remain unchanged)
       const adjacentPositions = [
         [row - 1, col], [row + 1, col], [row, col - 1], [row, col + 1]
       ]
       
       adjacentPositions.forEach(([r, c]) => {
-        if (r >= 0 && r < 3 && c >= 0 && c < 3 && grid[r][c] === TileColor.Gray) {
-          newGrid[r][c] = TileColor.White
+        if (r >= 0 && r < 3 && c >= 0 && c < 3) {
+          if (grid[r][c] === TileColor.Gray) {
+            newGrid[r][c] = TileColor.Blue // Gray becomes blue
+          } else if (grid[r][c] === TileColor.Blue) {
+            newGrid[r][c] = TileColor.Gray // Adjacent blue becomes gray
+          }
         }
       })
       return newGrid

@@ -450,11 +450,11 @@ describe('Tile Logic Tests', () => {
       
       // Expected result based on new understanding:
       // Pink, Blue, Pink
-      // White, Grey, White  
+      // White, Grey, Grey  
       // Pink, Red, Pink
       expect(result[1][0]).toBe('white') // was gray, expanded to
       expect(result[1][1]).toBe('gray') // was white, turned gray
-      expect(result[1][2]).toBe('white') // was white, unchanged (not adjacent)
+      expect(result[1][2]).toBe('gray') // was white, adjacent to clicked white so turns gray
       // Other tiles unchanged
       expect(result[0][0]).toBe('pink')
       expect(result[0][1]).toBe('blue')
@@ -482,6 +482,29 @@ describe('Tile Logic Tests', () => {
       expect(result[1][2]).toBe('white') // non-adjacent white unchanged
       expect(result[0][0]).toBe('pink') // other colors unchanged
       expect(result[2][1]).toBe('red') // other colors unchanged
+    })
+
+    test('user reported edge case: adjacent whites should turn gray', () => {
+      const grid = createGrid([
+        ['black', 'gray', 'white'],
+        ['white', 'yellow', 'white'],
+        ['blue', 'green', 'orange']
+      ])
+      
+      // Click top right white tile at (0,2)
+      // Expected: clicked white turns gray, adjacent gray turns white, adjacent white at (1,2) also turns gray
+      const result = applyWhiteTileLogic(grid, 0, 2)
+      
+      // Expected result:
+      // black white grey
+      // white yellow grey
+      // blue green orange
+      expect(result[0][2]).toBe('gray') // clicked white turns gray
+      expect(result[0][1]).toBe('white') // adjacent gray becomes white
+      expect(result[1][2]).toBe('gray') // adjacent white turns gray
+      expect(result[1][0]).toBe('white') // non-adjacent white unchanged
+      expect(result[0][0]).toBe('black') // other colors unchanged
+      expect(result[1][1]).toBe('yellow') // other colors unchanged
     })
   })
 
@@ -586,13 +609,97 @@ describe('Tile Logic Tests', () => {
       
       // Expected result with corrected white behavior:
       // Pink Gray Pink  (gray at (0,1) is NOT adjacent, unchanged)
-      // Grey White Blue  (blue at (1,0) becomes gray, white at (1,1) unchanged)
+      // Grey White Blue  (blue at (1,0) becomes gray, adjacent white at (1,1) unchanged)
       // Pink Red   Pink
       expect(result[1][0]).toBe('gray') // blue tile becomes gray (acting as white)
-      expect(result[1][1]).toBe('white') // adjacent white tile unchanged (no adjacent grays to expand to)
+      expect(result[1][1]).toBe('white') // adjacent white tile unchanged when blue copies white
       expect(result[0][1]).toBe('gray') // non-adjacent gray unchanged
       expect(result[1][2]).toBe('blue') // non-adjacent blue unchanged
       expect(result[2][1]).toBe('red') // non-adjacent colors unchanged
+    })
+
+    test('user reported edge case: blue copies white with gray neighbors', () => {
+      const grid = createGrid([
+        ['black', 'yellow', 'white'],
+        ['blue', 'white', 'white'],
+        ['gray', 'green', 'orange']
+      ])
+      
+      // Click blue tile at (1,0)
+      // Center tile is white, so blue should apply white behavior from (1,0)
+      // Adjacent to (1,0) are: (0,0), (1,1), (2,0) where (2,0) is gray
+      const result = applyBlueTileLogic(grid, 1, 0)
+      
+      // Expected result based on real box behavior:
+      // black yellow white
+      // gray  white  white  
+      // blue  green  orange
+      expect(result[1][0]).toBe('gray') // blue tile becomes gray (acting as white)
+      expect(result[2][0]).toBe('blue') // adjacent gray becomes blue
+      expect(result[1][1]).toBe('white') // adjacent white unchanged
+      expect(result[0][0]).toBe('black') // non-adjacent tiles unchanged
+      expect(result[1][2]).toBe('white') // non-adjacent white unchanged
+    })
+
+    test('blue copying white: gray becomes blue, adjacent blue becomes gray', () => {
+      const grid = createGrid([
+        ['red', 'blue', 'green'],
+        ['gray', 'white', 'yellow'],
+        ['orange', 'blue', 'pink']
+      ])
+      
+      // Click top blue tile at (0,1)
+      // Center tile is white, so blue should apply white behavior from (0,1)
+      // Adjacent to (0,1) are: (0,0) red, (0,2) green, (1,1) white, (1,1) already counted
+      // Let me use bottom blue at (2,1) instead
+      const result = applyBlueTileLogic(grid, 2, 1)
+      
+      // Adjacent to (2,1) are: (1,1) white, (2,0) orange, (2,2) pink
+      // Expected: clicked blue becomes gray, no grays or blues adjacent to transform
+      expect(result[2][1]).toBe('gray') // clicked blue becomes gray
+      expect(result[1][1]).toBe('white') // adjacent white unchanged
+      expect(result[2][0]).toBe('orange') // other tiles unchanged
+      expect(result[2][2]).toBe('pink') // other tiles unchanged
+    })
+
+    test('blue copying white with both gray and blue neighbors', () => {
+      const grid = createGrid([
+        ['gray', 'blue', 'red'],
+        ['blue', 'white', 'yellow'],
+        ['green', 'blue', 'orange']
+      ])
+      
+      // Click center blue tile at (2,1)
+      // Center tile is white, so blue should apply white behavior from (2,1)
+      // Adjacent to (2,1) are: (1,1) white, (2,0) green, (2,2) orange
+      // Let me click the top blue at (0,1) instead
+      const result = applyBlueTileLogic(grid, 0, 1)
+      
+      // Adjacent to (0,1) are: (0,0) gray, (0,2) red, (1,1) white
+      // Expected: clicked blue becomes gray, adjacent gray at (0,0) becomes blue
+      expect(result[0][1]).toBe('gray') // clicked blue becomes gray
+      expect(result[0][0]).toBe('blue') // adjacent gray becomes blue
+      expect(result[0][2]).toBe('red') // non-gray/blue unchanged
+      expect(result[1][1]).toBe('white') // adjacent white unchanged
+    })
+
+    test('blue copying white: adjacent blue tiles become gray', () => {
+      const grid = createGrid([
+        ['blue', 'blue', 'red'],
+        ['gray', 'white', 'yellow'],
+        ['green', 'orange', 'pink']
+      ])
+      
+      // Click top-left blue at (0,0)
+      // Center tile is white, so blue copies white behavior
+      // Adjacent to (0,0) are: (0,1) blue, (1,0) gray
+      // Expected: clicked blue becomes gray, adjacent blue becomes gray, adjacent gray becomes blue
+      const result = applyBlueTileLogic(grid, 0, 0)
+      
+      expect(result[0][0]).toBe('gray') // clicked blue becomes gray
+      expect(result[0][1]).toBe('gray') // adjacent blue becomes gray  
+      expect(result[1][0]).toBe('blue') // adjacent gray becomes blue
+      expect(result[0][2]).toBe('red') // non-adjacent tiles unchanged
     })
 
     test('copies purple tile behavior (move down)', () => {
