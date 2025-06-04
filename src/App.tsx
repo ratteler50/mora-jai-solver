@@ -3,22 +3,18 @@ import './App.css'
 import {
   TileColor,
   type TileColor as TileColorType,
-  applyBlackTileLogic,
-  applyRedTileLogic,
-  applyGreenTileLogic,
-  applyYellowTileLogic,
-  applyPinkTileLogic,
-  applyPurpleTileLogic,
-  applyOrangeTileLogic,
-  applyWhiteTileLogic,
-  applyBlueTileLogic
 } from './tileLogic'
 import {
   solvePuzzle,
-  formatMoves,
-  estimateSolvability,
-  type SolverResult
+  type SolverResult,
+  applyMove,
+  type Move,
 } from './solver'
+import PuzzleGrid from './components/PuzzleGrid';
+import SetupControls from './components/SetupControls';
+import SolutionDisplay from './components/SolutionDisplay';
+import TileBehaviorsInfo from './components/TileBehaviorsInfo';
+import CountrySymbolsInfo from './components/CountrySymbolsInfo';
 
 type AppMode = 'setup' | 'play'
 
@@ -83,44 +79,14 @@ function App() {
       setPuzzleState(newState)
     } else {
       // Play mode: apply tile logic
-      const currentColor = puzzleState.grid[row][col]
-      const newState = {...puzzleState}
+      const move: Move = { row, col };
+      const newSolverState = applyMove(puzzleState, move);
 
-      switch (currentColor) {
-        case TileColor.Gray:
-          // Gray tiles do nothing
-          break
-        case TileColor.Black:
-          newState.grid = applyBlackTileLogic(newState.grid, row)
-          break
-        case TileColor.Red:
-          newState.grid = applyRedTileLogic(newState.grid)
-          break
-        case TileColor.Green:
-          newState.grid = applyGreenTileLogic(newState.grid, row, col)
-          break
-        case TileColor.Yellow:
-          newState.grid = applyYellowTileLogic(newState.grid, row, col)
-          break
-        case TileColor.Pink:
-          newState.grid = applyPinkTileLogic(newState.grid, row, col)
-          break
-        case TileColor.Purple:
-          newState.grid = applyPurpleTileLogic(newState.grid, row, col)
-          break
-        case TileColor.Orange:
-          newState.grid = applyOrangeTileLogic(newState.grid, row, col)
-          break
-        case TileColor.White:
-          newState.grid = applyWhiteTileLogic(newState.grid, row, col)
-          break
-        case TileColor.Blue:
-          newState.grid = applyBlueTileLogic(newState.grid, row, col)
-          break
-      }
-
-      newState.corners = updateCorners(newState.grid)
-      setPuzzleState(newState)
+      setPuzzleState({
+        ...puzzleState, // Preserve targetCorners
+        grid: newSolverState.grid,
+        corners: newSolverState.corners,
+      });
     }
   }
 
@@ -150,14 +116,17 @@ function App() {
     })
   }
 
-  const handleCornerTargetSelect = (cornerIndex: number, color: TileColorType) => {
-    const newTargetCorners = [...puzzleState.targetCorners]
-    newTargetCorners[cornerIndex] = color
-    setPuzzleState({
-      ...puzzleState,
-      targetCorners: newTargetCorners
-    })
-  }
+  const handleGridCornerClick = (cornerIndex: number) => {
+    if (mode === 'setup') {
+      setPuzzleState(prevState => {
+        const newTargetCorners = [...prevState.targetCorners];
+        newTargetCorners[cornerIndex] = setupState.selectedBrushColor;
+        return { ...prevState, targetCorners: newTargetCorners };
+      });
+    } else {
+      handleResetToInitial(); // Play mode corner click resets
+    }
+  };
 
   const handleBrushColorSelect = (color: TileColorType) => {
     setSetupState({
@@ -240,15 +209,9 @@ function App() {
     return currentMove && currentMove.row === row && currentMove.col === col
   }
 
-  const getCurrentStepState = (): PuzzleState => {
-    if (!solverState.result || !solverState.result.solved || solverState.currentStep < 0) {
-      return puzzleState
-    }
-    // Return the state after the current step (currentStep + 1 because states[0] is initial state)
-    return solverState.result.states[solverState.currentStep + 1] || puzzleState
-  }
-
-  const isWinning = checkWinCondition()
+  // getCurrentStepState is now passed as a prop to SolutionDisplay
+  // const getCurrentStepState = (): PuzzleState | null => {
+  const isWinning = checkWinCondition();
 
   const allColors = [
     TileColor.White, TileColor.Black, TileColor.Red, TileColor.Yellow, 
@@ -327,76 +290,29 @@ function App() {
         </div>
 
         {mode === 'setup' && (
-          <div className="setup-controls">
-            <div className="control-section">
-              <h3>Set All Corners (Country Symbol):</h3>
-              <div className="symbol-grid">
-                {countrySymbols.map(symbol => (
-                  <div
-                    key={symbol.color}
-                    className={`symbol-item ${puzzleState.targetCorners.every(c => c === symbol.color) ? 'selected' : ''}`}
-                    onClick={() => handleTargetColorSelect(symbol.color)}
-                  >
-                    <img
-                      src={symbol.image}
-                      alt={`${symbol.name} symbol`}
-                      className="symbol-image"
-                    />
-                    <div className="symbol-info">
-                      <strong>{symbol.name}</strong>
-                      <small>{symbol.description}</small>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="control-section">
-              <h3>Brush Color:</h3>
-              <div className="color-palette">
-                {allColors.map(color => (
-                  <button
-                    key={color}
-                    className={`color-btn ${color} ${setupState.selectedBrushColor === color ? 'selected' : ''}`}
-                    onClick={() => handleBrushColorSelect(color)}
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
+          <SetupControls
+            puzzleTargetCorners={puzzleState.targetCorners}
+            selectedBrushColor={setupState.selectedBrushColor}
+            countrySymbols={countrySymbols}
+            allColors={allColors}
+            onBrushColorSelect={handleBrushColorSelect}
+            onTargetColorSelect={handleTargetColorSelect}
+          />
         )}
 
         <div className="main-layout">
           {/* Left Panel - Main Puzzle */}
           <div className="left-panel">
             <div className={`puzzle-container ${isWinning ? 'winning' : ''}`}>
-              <div className="corner top-left" onClick={mode === 'setup' ? () => handleCornerTargetSelect(0, setupState.selectedBrushColor) : handleResetToInitial}>
-                <div className={`corner-tile ${puzzleState.targetCorners[0]} ${puzzleState.corners[0] === puzzleState.targetCorners[0] ? 'winning' : ''}`}></div>
-              </div>
-              <div className="corner top-right" onClick={mode === 'setup' ? () => handleCornerTargetSelect(1, setupState.selectedBrushColor) : handleResetToInitial}>
-                <div className={`corner-tile ${puzzleState.targetCorners[1]} ${puzzleState.corners[1] === puzzleState.targetCorners[1] ? 'winning' : ''}`}></div>
-              </div>
-
-              <div className="grid">
-                {puzzleState.grid.map((row, rowIndex) =>
-                    row.map((color, colIndex) => (
-                        <div
-                            key={`${rowIndex}-${colIndex}`}
-                            className={`tile ${color} ${mode === 'setup' ? 'setup-mode' : ''} ${shouldHighlightTile(rowIndex, colIndex) ? 'highlighted' : ''}`}
-                            onClick={() => handleTileClick(rowIndex, colIndex)}
-                        >
-                        </div>
-                    ))
-                )}
-              </div>
-
-              <div className="corner bottom-left"
-                   onClick={mode === 'setup' ? () => handleCornerTargetSelect(2, setupState.selectedBrushColor) : handleResetToInitial}>
-                <div className={`corner-tile ${puzzleState.targetCorners[2]} ${puzzleState.corners[2] === puzzleState.targetCorners[2] ? 'winning' : ''}`}></div>
-              </div>
-              <div className="corner bottom-right"
-                   onClick={mode === 'setup' ? () => handleCornerTargetSelect(3, setupState.selectedBrushColor) : handleResetToInitial}>
-                <div className={`corner-tile ${puzzleState.targetCorners[3]} ${puzzleState.corners[3] === puzzleState.targetCorners[3] ? 'winning' : ''}`}></div>
-              </div>
+              <PuzzleGrid
+                grid={puzzleState.grid}
+                targetCorners={puzzleState.targetCorners}
+                currentCorners={puzzleState.corners}
+                mode={mode}
+                handleTileClick={handleTileClick}
+                handleCornerClick={handleGridCornerClick}
+                shouldHighlightTile={shouldHighlightTile}
+              />
             </div>
 
             <div className="info">
@@ -426,25 +342,7 @@ function App() {
                   <p>🎮 Play Mode: Solve the puzzle</p>
                   <p>Click tiles to activate their behaviors</p>
                   <p>Click corners to reset to initial state</p>
-                  
-                  <div className="solver-section">
-                    <button 
-                      className="solver-button"
-                      onClick={handleSolvePuzzle}
-                      disabled={solverState.isRunning || isWinning}
-                    >
-                      {solverState.isRunning ? '🤔 Solving...' : '🧠 Auto-Solve'}
-                    </button>
-                    
-                    {solverState.result && (
-                      <button 
-                        className="solver-toggle"
-                        onClick={handleToggleSolution}
-                      >
-                        {solverState.showSolution ? '📄 Hide Solution' : '📋 Show Solution'}
-                      </button>
-                    )}
-                  </div>
+                  {/* Solver buttons are now in SolutionDisplay, this div is removed. */}
                 </div>
               )}
             </div>
@@ -452,320 +350,30 @@ function App() {
 
           {/* Center Panel - Solution Display and Tile Behaviors */}
           <div className="center-panel">
-            {mode === 'play' && solverState.showSolution && solverState.result && (
-              <div className="solution-display">
-                {solverState.result.solved ? (
-                  <div>
-                    <h4>✅ Solution Found!</h4>
-                    <p><strong>Moves:</strong> {solverState.result.moves.length}</p>
-                    <p><strong>Time:</strong> {solverState.result.timeMs.toFixed(1)}ms</p>
-                    <p><strong>States explored:</strong> {solverState.result.totalStatesExplored.toLocaleString()}</p>
-                    
-                    <div className="moves-list">
-                      <h5>Move Sequence:</h5>
-                      
-                      {/* Step Navigation Controls */}
-                      <div className="step-controls">
-                        <button 
-                          className="step-button"
-                          onClick={handleStepReset}
-                          disabled={solverState.currentStep === -1}
-                        >
-                          ⏮️ Reset
-                        </button>
-                        <button 
-                          className="step-button"
-                          onClick={handleStepPrev}
-                          disabled={solverState.currentStep <= -1}
-                        >
-                          ⬅️ Prev
-                        </button>
-                        <span className="step-indicator">
-                          Step {solverState.currentStep + 1} of {solverState.result.moves.length}
-                          {solverState.currentStep === -1 && " (Initial)"}
-                        </span>
-                        <button 
-                          className="step-button"
-                          onClick={handleStepNext}
-                          disabled={solverState.currentStep >= solverState.result.moves.length - 1}
-                        >
-                          Next ➡️
-                        </button>
-                      </div>
-
-                      {/* Current Step Highlight */}
-                      {solverState.currentStep >= 0 && (
-                        <div className="current-step">
-                          <h6>Current Move:</h6>
-                          <p className="highlighted-move">
-                            {formatMoves(solverState.result.moves, solverState.result.states)[solverState.currentStep]}
-                          </p>
-                        </div>
-                      )}
-
-                      {/* Expected State Preview */}
-                      {solverState.currentStep >= 0 && (
-                        <div className="state-preview">
-                          <h6>Expected State After Step {solverState.currentStep + 1}:</h6>
-                          <div className="preview-grid">
-                            {getCurrentStepState().grid.map((row, rowIndex) =>
-                              row.map((color, colIndex) => (
-                                <div
-                                  key={`preview-${rowIndex}-${colIndex}`}
-                                  className={`preview-tile ${color}`}
-                                >
-                                </div>
-                              ))
-                            )}
-                          </div>
-                        </div>
-                      )}
-                      
-                      <ol>
-                        {formatMoves(solverState.result.moves, solverState.result.states).map((move, index) => (
-                          <li 
-                            key={index}
-                            className={index === solverState.currentStep ? 'current-step-item' : ''}
-                          >
-                            {move}
-                          </li>
-                        ))}
-                      </ol>
-                    </div>
-                  </div>
-                ) : (
-                  <div>
-                    <h4>❌ No Solution Found</h4>
-                    <p>Explored {solverState.result.totalStatesExplored.toLocaleString()} states in {solverState.result.timeMs.toFixed(1)}ms</p>
-                    {(() => {
-                      const estimate = estimateSolvability(puzzleState)
-                      const hitLimit = solverState.result.totalStatesExplored >= 50000
-                      
-                      if (hitLimit) {
-                        return (
-                          <p><strong>Analysis:</strong> Search limit reached - puzzle may be too complex or unsolvable</p>
-                        )
-                      } else if (!estimate.likely) {
-                        return (
-                          <p><strong>Analysis:</strong> {estimate.reason}</p>
-                        )
-                      } else {
-                        return (
-                          <p><strong>Analysis:</strong> Puzzle appears unsolvable with current configuration</p>
-                        )
-                      }
-                    })()}
-                  </div>
-                )}
-              </div>
-            )}
-            
-            <details className="spoiler-section">
-              <summary className="spoiler-toggle">Tile Behaviors</summary>
-              <div className="spoiler-content">
-                <h3>How Each Tile Works:</h3>
-                <div className="behaviors-grid">
-                  <div className="behavior-item">
-                    <span className="white behavior-tile"></span>
-                    <div className="behavior-info">
-                      <strong>White</strong>
-                      <small>Expands to adjacent gray or turns gray</small>
-                    </div>
-                  </div>
-                  <div className="behavior-item">
-                    <span className="black behavior-tile"></span>
-                    <div className="behavior-info">
-                      <strong>Black</strong>
-                      <small>Moves row tiles right</small>
-                    </div>
-                  </div>
-                  <div className="behavior-item">
-                    <span className="red behavior-tile"></span>
-                    <div className="behavior-info">
-                      <strong>Red</strong>
-                      <small>White→Black, Black→Red</small>
-                    </div>
-                  </div>
-                  <div className="behavior-item">
-                    <span className="yellow behavior-tile"></span>
-                    <div className="behavior-info">
-                      <strong>Yellow</strong>
-                      <small>Moves up one position</small>
-                    </div>
-                  </div>
-                  <div className="behavior-item">
-                    <span className="purple behavior-tile"></span>
-                    <div className="behavior-info">
-                      <strong>Purple</strong>
-                      <small>Moves down one position</small>
-                    </div>
-                  </div>
-                  <div className="behavior-item">
-                    <span className="green behavior-tile"></span>
-                    <div className="behavior-info">
-                      <strong>Green</strong>
-                      <small>Swaps with mirrored position</small>
-                    </div>
-                  </div>
-                  <div className="behavior-item">
-                    <span className="pink behavior-tile"></span>
-                    <div className="behavior-info">
-                      <strong>Pink</strong>
-                      <small>Rotates adjacent tiles clockwise</small>
-                    </div>
-                  </div>
-                  <div className="behavior-item">
-                    <span className="orange behavior-tile"></span>
-                    <div className="behavior-info">
-                      <strong>Orange</strong>
-                      <small>Matches majority adjacent color</small>
-                    </div>
-                  </div>
-                  <div className="behavior-item">
-                    <span className="blue behavior-tile"></span>
-                    <div className="behavior-info">
-                      <strong>Blue</strong>
-                      <small>Copies center tile behavior</small>
-                    </div>
-                  </div>
-                  <div className="behavior-item">
-                    <span className="gray behavior-tile"></span>
-                    <div className="behavior-info">
-                      <strong>Gray</strong>
-                      <small>No function (empty space)</small>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </details>
+            <SolutionDisplay
+              mode={mode}
+              solverState={solverState}
+              puzzleStateForEstimator={puzzleState}
+              handleSolvePuzzle={handleSolvePuzzle}
+              handleToggleSolution={handleToggleSolution}
+              handleStepNext={handleStepNext}
+              handleStepPrev={handleStepPrev}
+              handleStepReset={handleStepReset}
+              getCurrentStepState={() => {
+                if (!solverState.result || !solverState.result.solved || solverState.currentStep < 0) {
+                  return null;
+                }
+                // Return the state after the current step (currentStep + 1 because states[0] is initial state)
+                return solverState.result.states[solverState.currentStep + 1] || null;
+              }}
+              isWinning={isWinning}
+            />
+            <TileBehaviorsInfo />
           </div>
 
           {/* Right Panel - Country Symbols */}
           <div className="right-panel">
-            <details className="spoiler-section">
-              <summary className="spoiler-toggle">Country Symbols</summary>
-              <div className="spoiler-content">
-                <h3>Country Symbols & Target Colors:</h3>
-                <div className="countries-grid">
-                  <div className="country-item">
-                    <img
-                        src="https://static0.gamerantimages.com/wordpress/wp-content/uploads/2025/05/blue-prince-country-symbols-mora-jai.jpg"
-                        alt="Mora Jai symbol"
-                        className="country-symbol-img"
-                    />
-                    <div className="country-info">
-                      <strong>Mora Jai</strong>
-                      <span className="white legend-tile"></span>
-                      <small>White Arch</small>
-                    </div>
-                  </div>
-                  <div className="country-item">
-                    <img
-                        src="https://static0.gamerantimages.com/wordpress/wp-content/uploads/2025/05/blue-prince-country-symbols-orinda-aries.jpg"
-                        alt="Orinda Aries symbol"
-                        className="country-symbol-img"
-                    />
-                    <div className="country-info">
-                      <strong>Orinda Aries</strong>
-                      <span className="black legend-tile"></span>
-                      <small>Black Mirror</small>
-                    </div>
-                  </div>
-                  <div className="country-item">
-                    <img
-                        src="https://static0.gamerantimages.com/wordpress/wp-content/uploads/2025/05/blue-prince-country-symbols-fenn-aries.jpg"
-                        alt="Fenn Aries symbol"
-                        className="country-symbol-img"
-                    />
-                    <div className="country-info">
-                      <strong>Fenn Aries</strong>
-                      <span className="red legend-tile"></span>
-                      <small>Red Pentagon</small>
-                    </div>
-                  </div>
-                  <div className="country-item">
-                    <img
-                        src="https://static0.gamerantimages.com/wordpress/wp-content/uploads/2025/05/blue-prince-country-symbols-arch-aries.jpg"
-                        alt="Arch Aries symbol"
-                        className="country-symbol-img"
-                    />
-                    <div className="country-info">
-                      <strong>Arch Aries</strong>
-                      <span className="yellow legend-tile"></span>
-                      <small>Yellow Mountain</small>
-                    </div>
-                  </div>
-                  <div className="country-item">
-                    <img
-                        src="https://static0.gamerantimages.com/wordpress/wp-content/uploads/2025/05/blue-prince-country-symbols-eraja.jpg"
-                        alt="Ejara symbol"
-                        className="country-symbol-img"
-                    />
-                    <div className="country-info">
-                      <strong>Ejara</strong>
-                      <span className="purple legend-tile"></span>
-                      <small>Purple Hourglass</small>
-                    </div>
-                  </div>
-                  <div className="country-item">
-                    <img
-                        src="https://static0.gamerantimages.com/wordpress/wp-content/uploads/2025/05/blue-prince-country-symbols-nuance.jpg"
-                        alt="Nuance symbol"
-                        className="country-symbol-img"
-                    />
-                    <div className="country-info">
-                      <strong>Nuance</strong>
-                      <span className="green legend-tile"></span>
-                      <small>Green Diamond</small>
-                    </div>
-                  </div>
-                  <div className="country-item">
-                    <img
-                        src="https://static0.gamerantimages.com/wordpress/wp-content/uploads/2025/05/blue-prince-country-symbols-verra.jpg"
-                        alt="Verra symbol"
-                        className="country-symbol-img"
-                    />
-                    <div className="country-info">
-                      <strong>Verra</strong>
-                      <span className="pink legend-tile"></span>
-                      <small>Pink Jigsaw</small>
-                    </div>
-                  </div>
-                  <div className="country-item">
-                    <img
-                        src="https://static0.gamerantimages.com/wordpress/wp-content/uploads/2025/05/blue-prince-country-symbols-corarica.jpg"
-                        alt="Corarica symbol"
-                        className="country-symbol-img"
-                    />
-                    <div className="country-info">
-                      <strong>Corarica</strong>
-                      <span className="orange legend-tile"></span>
-                      <small>Orange Chevron</small>
-                    </div>
-                  </div>
-                  <div className="country-item">
-                    <img
-                        src="/mora-jai-solver/images/corner-symbols/mount_holly.png"
-                        alt="Mount Holly symbol"
-                        className="country-symbol-img"
-                    />
-                    <div className="country-info">
-                      <strong>Mt Holly</strong>
-                      <span className="blue legend-tile"></span>
-                      <small>Blue Throne</small>
-                    </div>
-                  </div>
-                </div>
-                <p className="spoiler-note">
-                  <strong>How to solve:</strong> Look at the symbols in the
-                  corners
-                  of your puzzle box.
-                  Each symbol represents a country. Get all four corners to match
-                  that country's flag color,
-                  then click the corners to complete the puzzle.
-                </p>
-              </div>
-            </details>
+            <CountrySymbolsInfo countrySymbols={countrySymbols} />
           </div>
         </div>
       </div>
