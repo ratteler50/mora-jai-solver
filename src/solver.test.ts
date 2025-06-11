@@ -1,5 +1,5 @@
-import { solvePuzzle, formatMoves, estimateSolvability, type PuzzleState } from './solver'
-import { TileColor } from './tileLogic'
+import {solvePuzzle, formatMoves, estimateSolvability, type PuzzleState, maxStates} from './solver'
+import {TileColor} from './tileLogic'
 
 describe('Solver Tests', () => {
   test('solves already solved puzzle', () => {
@@ -14,7 +14,7 @@ describe('Solver Tests', () => {
     }
 
     const result = solvePuzzle(solvedState)
-    
+
     expect(result.solved).toBe(true)
     expect(result.moves).toHaveLength(0)
     expect(result.totalStatesExplored).toBe(1)
@@ -32,7 +32,7 @@ describe('Solver Tests', () => {
     }
 
     const estimate = estimateSolvability(unsolvableState)
-    
+
     expect(estimate.likely).toBe(false)
     expect(estimate.reason).toContain("No functional tiles")
   })
@@ -49,7 +49,7 @@ describe('Solver Tests', () => {
     }
 
     const estimate = estimateSolvability(state)
-    
+
     expect(estimate.likely).toBe(false)
     expect(estimate.reason).toContain("Target color(s) red not present on the grid")
   })
@@ -66,7 +66,7 @@ describe('Solver Tests', () => {
     }
 
     const result = solvePuzzle(simpleState)
-    
+
     expect(result.solved).toBe(true)
     expect(result.moves.length).toBeGreaterThan(0)
     expect(result.totalStatesExplored).toBeGreaterThan(1)
@@ -74,10 +74,10 @@ describe('Solver Tests', () => {
 
   test('formats moves correctly', () => {
     const moves = [
-      { row: 0, col: 1 },
-      { row: 2, col: 0 }
+      {row: 0, col: 1},
+      {row: 2, col: 0}
     ]
-    
+
     const testState: PuzzleState = {
       grid: [
         [TileColor.White, TileColor.Red, TileColor.Blue],
@@ -90,7 +90,7 @@ describe('Solver Tests', () => {
 
     const states = [testState, testState] // For this simple test
     const formatted = formatMoves(moves, states)
-    
+
     expect(formatted).toHaveLength(2)
     expect(formatted[0]).toBe('Top Center Red')
     expect(formatted[1]).toBe('Bottom Left Blue')
@@ -110,10 +110,10 @@ describe('Solver Tests', () => {
     const startTime = performance.now()
     const result = solvePuzzle(complexState)
     const endTime = performance.now()
-    
+
     // Should complete reasonably quickly even if unsolvable
-    expect(endTime - startTime).toBeLessThan(5000) // 5 seconds max
-    expect(result.totalStatesExplored).toBeLessThanOrEqual(50000)
+    expect(endTime - startTime).toBeLessThan(30000) // 30 seconds max
+    expect(result.totalStatesExplored).toBe(maxStates + 1) // Should hit the max states limit
   })
 
   test('user reported bug - pink goal with specific setup', () => {
@@ -134,7 +134,7 @@ describe('Solver Tests', () => {
     console.log('orange orange orange')
     console.log('Target: pink')
     console.log('')
-    
+
     // Debug: Show the grid with coordinates
     console.log('Grid with coordinates:')
     for (let row = 0; row < 3; row++) {
@@ -145,28 +145,28 @@ describe('Solver Tests', () => {
     console.log('')
 
     const result = solvePuzzle(bugReportState)
-    
+
     if (result.solved) {
       console.log('Solution found!')
       console.log('Moves:', result.moves.length)
-      
+
       // Format the moves and verify they make sense
       const formattedMoves = formatMoves(result.moves, result.states)
       console.log('Formatted moves:')
       formattedMoves.forEach(move => console.log('  ' + move))
-      
+
       // Show the relationship between moves and states
       console.log('Move/State alignment check:')
       for (let i = 0; i < Math.min(3, result.moves.length); i++) {
         const move = result.moves[i]
         const state = result.states[i]
         const tileAtMovePosition = state.grid[move.row][move.col]
-        
+
         console.log(`  Move ${i + 1}: Position (${move.row}, ${move.col})`)
         console.log(`    State ${i} at that position: ${tileAtMovePosition}`)
         console.log(`    Formatted: ${formattedMoves[i]}`)
       }
-      
+
       // The key test: The first move should be valid for the initial state
       const firstMove = result.moves[0]
       const initialTileAtFirstMove = bugReportState.grid[firstMove.row][firstMove.col]
@@ -174,7 +174,7 @@ describe('Solver Tests', () => {
       console.log(`Critical test: First move at (${firstMove.row}, ${firstMove.col})`)
       console.log(`  Initial state has: ${initialTileAtFirstMove}`)
       console.log(`  Should not be gray!`)
-      
+
       expect(initialTileAtFirstMove).not.toBe(TileColor.Gray)
     } else {
       console.log('No solution found')

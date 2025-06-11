@@ -17,6 +17,7 @@ import {
   solvePuzzle,
   formatMoves,
   estimateSolvability,
+  maxStates,
   type SolverResult
 } from './solver'
 import premadeBoxesData from './premade_boxes.json';
@@ -664,7 +665,7 @@ function App() {
                     <p>Explored {solverState.result.totalStatesExplored.toLocaleString()} states in {solverState.result.timeMs.toFixed(1)}ms</p>
                     {(() => {
                       const estimate = estimateSolvability(puzzleState)
-                      const hitLimit = solverState.result.totalStatesExplored >= 5000000
+                      const hitLimit = solverState.result.totalStatesExplored >= maxStates
                       
                       if (hitLimit) {
                         return (

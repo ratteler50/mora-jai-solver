@@ -12,6 +12,9 @@ import {
   applyBlueTileLogic
 } from './tileLogic'
 
+// Maximum number of states to explore before giving up
+export const maxStates = 500000 // Prevent infinite loops or excessive computation
+
 export interface PuzzleState {
   grid: TileColorType[][]
   corners: TileColorType[]
@@ -139,7 +142,6 @@ export const solvePuzzle = (initialState: PuzzleState): SolverResult => {
   visited.add(gridToKey(initialState.grid))
   
   let statesExplored = 1
-  const maxStates = 500 // Prevent infinite loops or excessive computation
   
   while (queue.length > 0 && statesExplored < maxStates) {
     const current = queue.shift()!
