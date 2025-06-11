@@ -1,23 +1,10 @@
-import {
-  TileColor,
-  type TileColor as TileColorType,
-  applyBlackTileLogic,
-  applyRedTileLogic,
-  applyGreenTileLogic,
-  applyYellowTileLogic,
-  applyPinkTileLogic,
-  applyPurpleTileLogic,
-  applyOrangeTileLogic,
-  applyWhiteTileLogic,
-  applyBlueTileLogic
-} from './tileLogic'
+import {applyBlackTileLogic, applyBlueTileLogic, applyGreenTileLogic, applyOrangeTileLogic, applyPinkTileLogic, applyPurpleTileLogic, applyRedTileLogic, applyWhiteTileLogic, applyYellowTileLogic, TileColor, type TileColor as TileColorType} from './tileLogic'
 
 // Maximum number of states to explore before giving up
 export const maxStates = 5000000 // Prevent infinite loops or excessive computation
 
 export interface PuzzleState {
   grid: TileColorType[][]
-  corners: TileColorType[]
   targetCorners: TileColorType[] // Array of 4 target colors: [topLeft, topRight, bottomLeft, bottomRight]
 }
 
@@ -33,6 +20,7 @@ export interface SolverResult {
   moves: Move[]
   states: PuzzleState[]
   totalStatesExplored: number
+  maxDepthReached: number
   timeMs: number
 }
 
@@ -43,14 +31,11 @@ const gridToKey = (grid: TileColorType[][]): string => {
 
 // Helper function to check if puzzle is solved
 const isSolved = (state: PuzzleState): boolean => {
-  return state.corners.every((corner, index) => corner === state.targetCorners[index])
+  const corners = [(state.grid)[0][0], (state.grid)[0][2], (state.grid)[2][0], (state.grid)[2][2]]
+  return corners.every((corner, index) => corner === state.targetCorners[index])
 }
 
 // Helper function to update corners from grid
-const updateCorners = (grid: TileColorType[][]): TileColorType[] => {
-  return [grid[0][0], grid[0][2], grid[2][0], grid[2][2]]
-}
-
 // Apply a specific tile's logic to get the new state
 const applyMove = (state: PuzzleState, move: Move): PuzzleState => {
   const { row, col } = move
@@ -92,7 +77,6 @@ const applyMove = (state: PuzzleState, move: Move): PuzzleState => {
 
   return {
     grid: newGrid,
-    corners: updateCorners(newGrid),
     targetCorners: state.targetCorners
   }
 }
@@ -115,7 +99,7 @@ const generateMoves = (state: PuzzleState): Move[] => {
 }
 
 // Main solver function using BFS to find optimal solution
-export const solvePuzzle = (initialState: PuzzleState, customMaxStates: number): SolverResult => {
+export const solvePuzzle = (initialState: PuzzleState, customMaxStates?: number): SolverResult => {
   const startTime = performance.now()
   
   if (isSolved(initialState)) {
@@ -124,6 +108,7 @@ export const solvePuzzle = (initialState: PuzzleState, customMaxStates: number):
       moves: [],
       states: [initialState],
       totalStatesExplored: 1,
+      maxDepthReached: 0,
       timeMs: performance.now() - startTime
     }
   }
@@ -132,20 +117,26 @@ export const solvePuzzle = (initialState: PuzzleState, customMaxStates: number):
     state: PuzzleState
     moves: Move[]
     states: PuzzleState[]
+    depth: number
   }> = [{
     state: initialState,
     moves: [],
-    states: [initialState]
+    states: [initialState],
+    depth: 0
   }]
   
   const visited = new Set<string>()
   visited.add(gridToKey(initialState.grid))
   
   let statesExplored = 1
+  let maxDepthReached = 0
   const stateLimit = customMaxStates ?? maxStates
   
   while (queue.length > 0 && statesExplored < stateLimit) {
     const current = queue.shift()!
+    const currentDepth = current.depth
+    maxDepthReached = Math.max(maxDepthReached, currentDepth)
+    
     const possibleMoves = generateMoves(current.state)
     
     for (const move of possibleMoves) {
@@ -162,6 +153,7 @@ export const solvePuzzle = (initialState: PuzzleState, customMaxStates: number):
       
       const newMoves = [...current.moves, move]
       const newStates = [...current.states, newState]
+      const newDepth = currentDepth + 1
       
       // Check if this state is solved
       if (isSolved(newState)) {
@@ -170,6 +162,7 @@ export const solvePuzzle = (initialState: PuzzleState, customMaxStates: number):
           moves: newMoves,
           states: newStates,
           totalStatesExplored: statesExplored,
+          maxDepthReached: Math.max(maxDepthReached, newDepth),
           timeMs: performance.now() - startTime
         }
       }
@@ -178,7 +171,8 @@ export const solvePuzzle = (initialState: PuzzleState, customMaxStates: number):
       queue.push({
         state: newState,
         moves: newMoves,
-        states: newStates
+        states: newStates,
+        depth: newDepth
       })
     }
   }
@@ -189,6 +183,7 @@ export const solvePuzzle = (initialState: PuzzleState, customMaxStates: number):
     moves: [],
     states: [initialState],
     totalStatesExplored: statesExplored,
+    maxDepthReached: maxDepthReached,
     timeMs: performance.now() - startTime
   }
 }

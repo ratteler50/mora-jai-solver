@@ -9,7 +9,6 @@ describe('Solver Tests', () => {
         [TileColor.Gray, TileColor.Gray, TileColor.Gray],
         [TileColor.Red, TileColor.Gray, TileColor.Red]
       ],
-      corners: [TileColor.Red, TileColor.Red, TileColor.Red, TileColor.Red],
       targetCorners: [TileColor.Red, TileColor.Red, TileColor.Red, TileColor.Red]
     }
 
@@ -18,6 +17,7 @@ describe('Solver Tests', () => {
     expect(result.solved).toBe(true)
     expect(result.moves).toHaveLength(0)
     expect(result.totalStatesExplored).toBe(1)
+    expect(result.maxDepthReached).toBe(0)
   })
 
   test('detects unsolvable puzzle with no functional tiles', () => {
@@ -27,7 +27,6 @@ describe('Solver Tests', () => {
         [TileColor.Gray, TileColor.Gray, TileColor.Gray],
         [TileColor.Gray, TileColor.Gray, TileColor.Gray]
       ],
-      corners: [TileColor.Gray, TileColor.Gray, TileColor.Gray, TileColor.Gray],
       targetCorners: [TileColor.Gray, TileColor.Gray, TileColor.Gray, TileColor.Gray] // Gray target means no change needed, but also no functional tiles
     }
 
@@ -44,7 +43,6 @@ describe('Solver Tests', () => {
         [TileColor.Green, TileColor.Blue, TileColor.Green],
         [TileColor.Blue, TileColor.Green, TileColor.Blue]
       ],
-      corners: [TileColor.Blue, TileColor.Blue, TileColor.Blue, TileColor.Blue],
       targetCorners: [TileColor.Red, TileColor.Red, TileColor.Red, TileColor.Red]
     }
 
@@ -61,7 +59,6 @@ describe('Solver Tests', () => {
         [TileColor.Gray, TileColor.Red, TileColor.Gray],
         [TileColor.Black, TileColor.Gray, TileColor.Black]
       ],
-      corners: [TileColor.White, TileColor.White, TileColor.Black, TileColor.Black],
       targetCorners: [TileColor.Red, TileColor.Red, TileColor.Red, TileColor.Red]
     }
 
@@ -70,6 +67,7 @@ describe('Solver Tests', () => {
     expect(result.solved).toBe(true)
     expect(result.moves.length).toBeGreaterThan(0)
     expect(result.totalStatesExplored).toBeGreaterThan(1)
+    expect(result.maxDepthReached).toBeGreaterThanOrEqual(result.moves.length)
   })
 
   test('formats moves correctly', () => {
@@ -84,7 +82,6 @@ describe('Solver Tests', () => {
         [TileColor.Green, TileColor.Yellow, TileColor.Purple],
         [TileColor.Blue, TileColor.Orange, TileColor.Black]
       ],
-      corners: [TileColor.White, TileColor.Blue, TileColor.Blue, TileColor.Black],
       targetCorners: [TileColor.Red, TileColor.Red, TileColor.Red, TileColor.Red]
     }
 
@@ -103,7 +100,6 @@ describe('Solver Tests', () => {
         [TileColor.Green, TileColor.Yellow, TileColor.Purple],
         [TileColor.White, TileColor.Black, TileColor.Red]
       ],
-      corners: [TileColor.Pink, TileColor.Blue, TileColor.White, TileColor.Red],
       targetCorners: [TileColor.Gray, TileColor.Gray, TileColor.Gray, TileColor.Gray] // Impossible target
     }
 
@@ -116,6 +112,26 @@ describe('Solver Tests', () => {
     expect(endTime - startTime).toBeLessThan(5000) // 5 seconds max
     expect(result.totalStatesExplored).toBeGreaterThanOrEqual(testMaxStates) // Should hit the test max states limit
     expect(result.totalStatesExplored).toBeLessThan(testMaxStates + 100) // But not too far over
+    expect(result.maxDepthReached).toBeGreaterThan(0) // Should have explored some depth
+  })
+
+  test('depth tracking works correctly', () => {
+    // Create a simple puzzle that requires exactly 1 move
+    const oneMovePuzzle: PuzzleState = {
+      grid: [
+        [TileColor.Red, TileColor.Gray, TileColor.Red],
+        [TileColor.Gray, TileColor.Red, TileColor.Gray],
+        [TileColor.Black, TileColor.Gray, TileColor.Black]
+      ],
+      targetCorners: [TileColor.Red, TileColor.Red, TileColor.Red, TileColor.Red]
+    }
+
+    const result = solvePuzzle(oneMovePuzzle)
+
+    // For a BFS solution, maxDepthReached should equal the solution length
+    expect(result.maxDepthReached).toBe(result.moves.length)
+    expect(result.maxDepthReached).toBeGreaterThan(0)
+
   })
 
   test('user reported bug - pink goal with specific setup', () => {
@@ -125,7 +141,6 @@ describe('Solver Tests', () => {
         [TileColor.Gray, TileColor.Gray, TileColor.Gray],
         [TileColor.Orange, TileColor.Orange, TileColor.Orange]
       ],
-      corners: [TileColor.Pink, TileColor.Gray, TileColor.Orange, TileColor.Orange],
       targetCorners: [TileColor.Pink, TileColor.Pink, TileColor.Pink, TileColor.Pink]
     }
 

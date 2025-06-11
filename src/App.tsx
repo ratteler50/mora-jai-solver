@@ -40,7 +40,6 @@ type AppMode = 'setup' | 'play'
 
 interface PuzzleState {
   grid: TileColorType[][]
-  corners: TileColorType[]
   targetCorners: TileColorType[] // Array of 4 target colors: [topLeft, topRight, bottomLeft, bottomRight]
 }
 
@@ -147,7 +146,6 @@ function App() {
 
     setPuzzleState({
       grid: newGrid,
-      corners: updateCorners(newGrid),
       targetCorners: newTargetCorners,
     });
 
@@ -173,12 +171,10 @@ function App() {
   })
   const [initialPuzzleState, setInitialPuzzleState] = useState<PuzzleState>({
     grid: defaultGrid,
-    corners: [defaultGrid[0][0], defaultGrid[0][2], defaultGrid[2][0], defaultGrid[2][2]],
     targetCorners: [TileColor.Red, TileColor.Red, TileColor.Red, TileColor.Red]
   })
   const [puzzleState, setPuzzleState] = useState<PuzzleState>({
     grid: defaultGrid,
-    corners: [defaultGrid[0][0], defaultGrid[0][2], defaultGrid[2][0], defaultGrid[2][2]],
     targetCorners: [TileColor.Red, TileColor.Red, TileColor.Red, TileColor.Red]
   })
 
@@ -192,8 +188,7 @@ function App() {
       )
       const newState = {
         ...puzzleState,
-        grid: newGrid,
-        corners: updateCorners(newGrid)
+        grid: newGrid
       }
       setPuzzleState(newState)
     } else {
@@ -234,7 +229,6 @@ function App() {
           break
       }
 
-      newState.corners = updateCorners(newState.grid)
       setPuzzleState(newState)
     }
   }
@@ -344,7 +338,8 @@ function App() {
   }
 
   const checkWinCondition = (): boolean => {
-    return mode === 'play' && puzzleState.corners.every((corner, index) => corner === puzzleState.targetCorners[index])
+    const corners = updateCorners(puzzleState.grid)
+    return mode === 'play' && corners.every((corner, index) => corner === puzzleState.targetCorners[index])
   }
 
   const shouldHighlightTile = (row: number, col: number): boolean => {
@@ -364,6 +359,7 @@ function App() {
   }
 
   const isWinning = checkWinCondition()
+  const currentCorners = updateCorners(puzzleState.grid)
 
   const allColors = [
     TileColor.White, TileColor.Black, TileColor.Red, TileColor.Yellow, 
@@ -496,10 +492,10 @@ function App() {
           <div className="left-panel">
             <div className={`puzzle-container ${isWinning ? 'winning' : ''}`}>
               <div className="corner top-left" onClick={mode === 'setup' ? () => handleCornerTargetSelect(0, setupState.selectedBrushColor) : handleResetToInitial}>
-                <div className={`corner-tile ${puzzleState.targetCorners[0]} ${puzzleState.corners[0] === puzzleState.targetCorners[0] ? 'winning' : ''}`}></div>
+                <div className={`corner-tile ${puzzleState.targetCorners[0]} ${currentCorners[0] === puzzleState.targetCorners[0] ? 'winning' : ''}`}></div>
               </div>
               <div className="corner top-right" onClick={mode === 'setup' ? () => handleCornerTargetSelect(1, setupState.selectedBrushColor) : handleResetToInitial}>
-                <div className={`corner-tile ${puzzleState.targetCorners[1]} ${puzzleState.corners[1] === puzzleState.targetCorners[1] ? 'winning' : ''}`}></div>
+                <div className={`corner-tile ${puzzleState.targetCorners[1]} ${currentCorners[1] === puzzleState.targetCorners[1] ? 'winning' : ''}`}></div>
               </div>
 
               <div className="grid">
@@ -517,11 +513,11 @@ function App() {
 
               <div className="corner bottom-left"
                    onClick={mode === 'setup' ? () => handleCornerTargetSelect(2, setupState.selectedBrushColor) : handleResetToInitial}>
-                <div className={`corner-tile ${puzzleState.targetCorners[2]} ${puzzleState.corners[2] === puzzleState.targetCorners[2] ? 'winning' : ''}`}></div>
+                <div className={`corner-tile ${puzzleState.targetCorners[2]} ${currentCorners[2] === puzzleState.targetCorners[2] ? 'winning' : ''}`}></div>
               </div>
               <div className="corner bottom-right"
                    onClick={mode === 'setup' ? () => handleCornerTargetSelect(3, setupState.selectedBrushColor) : handleResetToInitial}>
-                <div className={`corner-tile ${puzzleState.targetCorners[3]} ${puzzleState.corners[3] === puzzleState.targetCorners[3] ? 'winning' : ''}`}></div>
+                <div className={`corner-tile ${puzzleState.targetCorners[3]} ${currentCorners[3] === puzzleState.targetCorners[3] ? 'winning' : ''}`}></div>
               </div>
             </div>
 
@@ -663,6 +659,7 @@ function App() {
                   <div>
                     <h4>❌ No Solution Found</h4>
                     <p>Explored {solverState.result.totalStatesExplored.toLocaleString()} states in {solverState.result.timeMs.toFixed(1)}ms</p>
+                    <p>Max depth reached: {solverState.result.maxDepthReached}</p>
                     {(() => {
                       const estimate = estimateSolvability(puzzleState)
                       const hitLimit = solverState.result.totalStatesExplored >= maxStates
