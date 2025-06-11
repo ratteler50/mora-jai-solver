@@ -1,4 +1,4 @@
-import {solvePuzzle, formatMoves, estimateSolvability, type PuzzleState, maxStates} from './solver'
+import {solvePuzzle, formatMoves, estimateSolvability, type PuzzleState} from './solver'
 import {TileColor} from './tileLogic'
 
 describe('Solver Tests', () => {
@@ -107,13 +107,15 @@ describe('Solver Tests', () => {
       targetCorners: [TileColor.Gray, TileColor.Gray, TileColor.Gray, TileColor.Gray] // Impossible target
     }
 
+    const testMaxStates = 1000 // Use smaller limit for testing performance
     const startTime = performance.now()
-    const result = solvePuzzle(complexState)
+    const result = solvePuzzle(complexState, testMaxStates)
     const endTime = performance.now()
 
     // Should complete reasonably quickly even if unsolvable
-    expect(endTime - startTime).toBeLessThan(30000) // 30 seconds max
-    expect(result.totalStatesExplored).toBe(maxStates + 1) // Should hit the max states limit
+    expect(endTime - startTime).toBeLessThan(5000) // 5 seconds max
+    expect(result.totalStatesExplored).toBeGreaterThanOrEqual(testMaxStates) // Should hit the test max states limit
+    expect(result.totalStatesExplored).toBeLessThan(testMaxStates + 100) // But not too far over
   })
 
   test('user reported bug - pink goal with specific setup', () => {

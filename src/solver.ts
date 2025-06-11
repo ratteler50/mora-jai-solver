@@ -13,7 +13,7 @@ import {
 } from './tileLogic'
 
 // Maximum number of states to explore before giving up
-export const maxStates = 500000 // Prevent infinite loops or excessive computation
+export const maxStates = 5000000 // Prevent infinite loops or excessive computation
 
 export interface PuzzleState {
   grid: TileColorType[][]
@@ -115,7 +115,7 @@ const generateMoves = (state: PuzzleState): Move[] => {
 }
 
 // Main solver function using BFS to find optimal solution
-export const solvePuzzle = (initialState: PuzzleState): SolverResult => {
+export const solvePuzzle = (initialState: PuzzleState, customMaxStates: number): SolverResult => {
   const startTime = performance.now()
   
   if (isSolved(initialState)) {
@@ -142,8 +142,9 @@ export const solvePuzzle = (initialState: PuzzleState): SolverResult => {
   visited.add(gridToKey(initialState.grid))
   
   let statesExplored = 1
+  const stateLimit = customMaxStates ?? maxStates
   
-  while (queue.length > 0 && statesExplored < maxStates) {
+  while (queue.length > 0 && statesExplored < stateLimit) {
     const current = queue.shift()!
     const possibleMoves = generateMoves(current.state)
     
