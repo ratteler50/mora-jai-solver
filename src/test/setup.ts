@@ -1,1 +1,1 @@
-// Test setup file - currently no setup needed for pure logic tests
+import '@testing-library/jest-dom';

@@ -139,7 +139,7 @@ export const solvePuzzle = (initialState: PuzzleState): SolverResult => {
   visited.add(gridToKey(initialState.grid))
   
   let statesExplored = 1
-  const maxStates = 5000000 // Prevent infinite loops or excessive computation
+  const maxStates = 500 // Prevent infinite loops or excessive computation
   
   while (queue.length > 0 && statesExplored < maxStates) {
     const current = queue.shift()!
@@ -224,8 +224,8 @@ export const estimateSolvability = (state: PuzzleState): {
   // Basic heuristics to help users understand why puzzles might be unsolvable
   
   // Check if all target colors exist on the grid
-  const gridColors = state.grid.flat()
-  const missingTargets = state.targetCorners.filter(target => !gridColors.includes(target))
+  const gridColors = [...new Set(state.grid.flat())]
+  const missingTargets = [...new Set(state.targetCorners)].filter(target => !gridColors.includes(target))
   if (missingTargets.length > 0) {
     return {
       likely: false,
@@ -234,7 +234,7 @@ export const estimateSolvability = (state: PuzzleState): {
   }
   
   // Check if there are any functional tiles (non-gray)
-  const functionalTiles = state.grid.flat().filter(color => color !== TileColor.Gray)
+  const functionalTiles = gridColors.filter(color => color !== TileColor.Gray)
   if (functionalTiles.length === 0) {
     return {
       likely: false,

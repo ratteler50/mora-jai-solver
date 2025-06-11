@@ -19,6 +19,21 @@ import {
   estimateSolvability,
   type SolverResult
 } from './solver'
+import premadeBoxesData from './premade_boxes.json';
+
+const colorNameToEnum: { [key: string]: TileColorType } = {
+  "white": TileColor.White,
+  "black": TileColor.Black,
+  "red": TileColor.Red,
+  "yellow": TileColor.Yellow,
+  "purple": TileColor.Purple,
+  "green": TileColor.Green,
+  "pink": TileColor.Pink,
+  "orange": TileColor.Orange,
+  "blue": TileColor.Blue,
+  "grey": TileColor.Gray,
+  "gray": TileColor.Gray
+};
 
 type AppMode = 'setup' | 'play'
 
@@ -39,7 +54,106 @@ interface SolverState {
   currentStep: number
 }
 
+interface PremadeBox {
+  location: string;
+  pattern: string; // Should contain 9 grid colors
+  corners: string; // Should contain 4 corner colors
+}
+
+const premadeBoxes: PremadeBox[] = premadeBoxesData as PremadeBox[];
+
 function App() {
+  const handlePremadeBoxSelect = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedLocation = event.target.value;
+    // If the placeholder (empty value) is selected, do nothing.
+    if (!selectedLocation) {
+      return;
+    }
+
+    const foundBox = premadeBoxes.find(box => box.location === selectedLocation);
+    if (!foundBox) {
+      console.error(`Premade box with location "${selectedLocation}" not found.`);
+      // Reset dropdown to placeholder
+      event.target.value = "";
+      return;
+    }
+
+    const gridColorStrings = foundBox.pattern.split(' ').map(colorStr => colorStr.toLowerCase());
+    const cornerColorStrings = foundBox.corners.split(' ').map(colorStr => colorStr.toLowerCase());
+
+    if (gridColorStrings.length < 9) {
+      console.error(`Grid pattern for "${selectedLocation}" is too short. Needs 9 colors, got ${gridColorStrings.length}.`);
+      event.target.value = ""; // Reset dropdown
+      return;
+    }
+
+    if (cornerColorStrings.length < 4) {
+      console.error(`Corner pattern for "${selectedLocation}" is too short. Needs 4 colors, got ${cornerColorStrings.length}.`);
+      event.target.value = ""; // Reset dropdown
+      return;
+    }
+
+    const newGrid: TileColorType[][] = [
+      [TileColor.Gray, TileColor.Gray, TileColor.Gray], // Initialize with defaults
+      [TileColor.Gray, TileColor.Gray, TileColor.Gray],
+      [TileColor.Gray, TileColor.Gray, TileColor.Gray]
+    ];
+
+    for (let i = 0; i < 9; i++) {
+      const colorName = gridColorStrings[i];
+      const tileColor = colorNameToEnum[colorName];
+      if (!tileColor) {
+        console.error(`Invalid color name "${colorName}" in grid pattern for "${selectedLocation}" at index ${i}. Defaulting to Gray.`);
+        newGrid[Math.floor(i/3)][i%3] = TileColor.Gray;
+      } else {
+        newGrid[Math.floor(i/3)][i%3] = tileColor;
+      }
+    }
+
+    const newTargetCorners: TileColorType[] = [TileColor.Red, TileColor.Red, TileColor.Red, TileColor.Red]; // Initialize with defaults
+
+    // cornerColorStrings is TL, TR, BR, BL
+    // targetCorners state array is TL, TR, BL, BR
+
+    const targetCornerSourceColors = [ // Directly from cornerColorStrings in TL, TR, BR, BL order
+        cornerColorStrings[0], // TL
+        cornerColorStrings[1], // TR
+        cornerColorStrings[2], // BR
+        cornerColorStrings[3]  // BL
+    ];
+
+    // Map to targetCorners state order [TL, TR, BL, BR]
+    const mappedColorsForState = [
+        colorNameToEnum[targetCornerSourceColors[0]], // TL
+        colorNameToEnum[targetCornerSourceColors[1]], // TR
+        colorNameToEnum[targetCornerSourceColors[3]], // BL (from source index 3)
+        colorNameToEnum[targetCornerSourceColors[2]]  // BR (from source index 2)
+    ];
+
+    for (let i = 0; i < 4; i++) {
+        if (!mappedColorsForState[i]) {
+            let originalStringColor = "";
+            if (i === 0) originalStringColor = targetCornerSourceColors[0]; // TL
+            else if (i === 1) originalStringColor = targetCornerSourceColors[1]; // TR
+            else if (i === 2) originalStringColor = targetCornerSourceColors[3]; // BL
+            else if (i === 3) originalStringColor = targetCornerSourceColors[2]; // BR
+            console.error(`Invalid color name "${originalStringColor}" in corner pattern for "${selectedLocation}". Defaulting to Red.`);
+            newTargetCorners[i] = TileColor.Red;
+        } else {
+            newTargetCorners[i] = mappedColorsForState[i];
+        }
+    }
+
+    setPuzzleState({
+      grid: newGrid,
+      corners: updateCorners(newGrid),
+      targetCorners: newTargetCorners,
+    });
+
+    // Reset dropdown to placeholder to allow re-selection
+    event.target.value = "";
+  };
+
   const defaultGrid = [
     [TileColor.Gray, TileColor.Gray, TileColor.Gray],
     [TileColor.Gray, TileColor.Gray, TileColor.Gray],
@@ -362,6 +476,17 @@ function App() {
                 ))}
               </div>
             </div>
+            <div className="control-section">
+              <h3>Load Premade Box:</h3>
+              <select onChange={handlePremadeBoxSelect} defaultValue="">
+                <option value="" disabled>Select a premade box...</option>
+                {premadeBoxes.map(box => (
+                  <option key={box.location} value={box.location}>
+                    {box.location}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         )}
 
@@ -539,7 +664,7 @@ function App() {
                     <p>Explored {solverState.result.totalStatesExplored.toLocaleString()} states in {solverState.result.timeMs.toFixed(1)}ms</p>
                     {(() => {
                       const estimate = estimateSolvability(puzzleState)
-                      const hitLimit = solverState.result.totalStatesExplored >= 50000
+                      const hitLimit = solverState.result.totalStatesExplored >= 5000000
                       
                       if (hitLimit) {
                         return (
@@ -745,7 +870,7 @@ function App() {
                   </div>
                   <div className="country-item">
                     <img
-                        src="/mora-jai-solver/images/corner-symbols/mount_holly.png"
+                        // src="/mora-jai-solver/images/corner-symbols/mount_holly.png"
                         alt="Mount Holly symbol"
                         className="country-symbol-img"
                     />
