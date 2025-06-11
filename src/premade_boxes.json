@@ -1,0 +1,352 @@
+[
+  {
+    "location": "Trading Post",
+    "pattern": "pink grey grey grey yellow yellow grey yellow yellow",
+    "corners": "yellow yellow yellow yellow"
+  },
+  {
+    "location": "Tunnel",
+    "pattern": "black orange pink orange orange orange pink orange orange",
+    "corners": "orange orange orange orange"
+  },
+  {
+    "location": "Blue Prince Throne Room",
+    "pattern": "black green blue blue blue blue purple grey grey",
+    "corners": "blue blue blue blue"
+  },
+  {
+    "location": "Lost and Found",
+    "pattern": "pink pink pink pink grey pink grey grey grey",
+    "corners": "pink pink pink pink"
+  },
+  {
+    "location": "Closed Exhibit",
+    "pattern": "orange black orange orange red orange orange black orange",
+    "corners": "red red red red"
+  },
+  {
+    "location": "Clara Tomb",
+    "pattern": "grey purple grey grey pink grey purple purple purple",
+    "corners": "purple purple purple purple"
+  },
+  {
+    "location": "Solarium",
+    "pattern": "green grey yellow green yellow green yellow grey green",
+    "corners": "green green green green"
+  },
+  {
+    "location": "Master Bedroom",
+    "pattern": "white grey white white grey grey grey grey white",
+    "corners": "white white white white"
+  },
+  {
+    "location": "Inner sanctum Orindia",
+    "pattern": "green black green black black black green yellow green",
+    "corners": "black black black black"
+  },
+  {
+    "location": "Inner sanctum Fenn Aries",
+    "pattern": "grey green grey orange red orange white green black",
+    "corners": "red red red red"
+  },
+  {
+    "location": "Inner sanctum Arch Aries",
+    "pattern": "black yellow grey yellow green yellow grey yellow black",
+    "corners": "yellow yellow yellow yellow"
+  },
+  {
+    "location": "Inner sanctum Eraja",
+    "pattern": "yellow purple yellow green red black purple purple purple",
+    "corners": "purple purple purple purple"
+  },
+  {
+    "location": "Inner sanctum Corarica",
+    "pattern": "orange black orange orange orange orange purple green purple",
+    "corners": "orange orange orange orange"
+  },
+  {
+    "location": "Inner sanctum Mora Jai",
+    "pattern": "yellow yellow yellow white pink white grey grey grey",
+    "corners": "white white white white"
+  },
+  {
+    "location": "Inner sanctum Verra",
+    "pattern": "pink pink grey grey grey grey orange orange orange",
+    "corners": "pink pink pink pink"
+  },
+  {
+    "location": "Inner sanctum Nuance",
+    "pattern": "green grey green grey orange orange grey black purple",
+    "corners": "green green green green"
+  },
+  {
+    "location": "The Unknown Box #1",
+    "pattern": "black black black green black grey grey grey pink",
+    "corners": "black black black black"
+  },
+  {
+    "location": "The Unknown Box #2",
+    "pattern": "orange grey purple orange grey purple black black black",
+    "corners": "black black black black"
+  },
+  {
+    "location": "The Unknown Box #3",
+    "pattern": "black black black grey grey grey pink purple orange",
+    "corners": "black black black black"
+  },
+  {
+    "location": "The Unknown Box #4",
+    "pattern": "black black black orange grey orange yellow grey yellow",
+    "corners": "black black black black"
+  },
+  {
+    "location": "The Unknown Box #5",
+    "pattern": "orange grey pink black grey black green grey orange",
+    "corners": "black black black black"
+  },
+  {
+    "location": "The Unknown Box #6",
+    "pattern": "black purple black grey grey grey orange green orange",
+    "corners": "black black black black"
+  },
+  {
+    "location": "The Unknown Box #7",
+    "pattern": "orange orange orange black green black purple green purple",
+    "corners": "black black black black"
+  },
+  {
+    "location": "The Unknown Box #8",
+    "pattern": "black green yellow black black black grey grey grey",
+    "corners": "black black black black"
+  },
+  {
+    "location": "Blueprints Conservatory (A1)",
+    "pattern": "black grey orange orange green orange orange green yellow",
+    "corners": "green green green green"
+  },
+  {
+    "location": "Blueprints Maid's Chamber (A2)",
+    "pattern": "pink pink pink orange orange orange purple purple purple",
+    "corners": "purple purple purple purple"
+  },
+  {
+    "location": "Blueprints Entrance Hall (A3)",
+    "pattern": "yellow yellow yellow black yellow green grey blue grey",
+    "corners": "yellow yellow yellow yellow"
+  },
+  {
+    "location": "Blueprints Pantry (A4)",
+    "pattern": "blue purple blue black blue purple blue purple purple",
+    "corners": "blue blue blue blue"
+  },
+  {
+    "location": "Blueprints Storeroom (A5)",
+    "pattern": "black black black grey orange grey pink red pink",
+    "corners": "red red red red"
+  },
+  {
+    "location": "Blueprints Bedroom (B1)",
+    "pattern": "orange yellow orange green grey green blue green blue",
+    "corners": "green green green green"
+  },
+  {
+    "location": "Blueprints Drawing Room (B2)",
+    "pattern": "purple purple purple black grey grey orange blue orange",
+    "corners": "purple purple purple purple"
+  },
+  {
+    "location": "Blueprints Gallery (B3)",
+    "pattern": "grey black grey yellow blue yellow blue blue blue",
+    "corners": "blue blue blue blue"
+  },
+  {
+    "location": "Blueprints Library (B4)",
+    "pattern": "pink orange orange blue blue pink orange orange pink",
+    "corners": "blue blue blue blue"
+  },
+  {
+    "location": "Blueprints Cloister (B5)",
+    "pattern": "pink black pink orange grey orange pink red pink",
+    "corners": "orange red orange red"
+  },
+  {
+    "location": "Blueprints Solarium (C1)",
+    "pattern": "black green black orange purple orange blue green blue",
+    "corners": "green green green green"
+  },
+  {
+    "location": "Blueprints Hallway (C2)",
+    "pattern": "white white white yellow white black blue blue blue",
+    "corners": "blue blue blue blue"
+  },
+  {
+    "location": "Blueprints Dining Room (C3)",
+    "pattern": "pink orange pink orange blue orange pink orange pink",
+    "corners": "orange orange orange orange"
+  },
+  {
+    "location": "Blueprints Observatory (C4)",
+    "pattern": "green blue grey black blue grey purple blue blue",
+    "corners": "blue blue blue blue"
+  },
+  {
+    "location": "Blueprints East Wing Hall (C5)",
+    "pattern": "purple white purple white white white blue pink blue",
+    "corners": "blue blue blue blue"
+  },
+  {
+    "location": "Blueprints Nook (D1)",
+    "pattern": "red green orange black black black purple blue purple",
+    "corners": "purple purple purple purple"
+  },
+  {
+    "location": "Blueprints Kitchen (D2)",
+    "pattern": "orange green orange yellow orange orange blue yellow orange",
+    "corners": "orange orange orange orange"
+  },
+  {
+    "location": "Blueprints Corridor (D3)",
+    "pattern": "green yellow green blue orange blue blue orange blue",
+    "corners": "blue blue blue blue"
+  },
+  {
+    "location": "Blueprints Music Room (D4)",
+    "pattern": "pink blue blue blue blue purple green grey pink",
+    "corners": "blue blue blue blue"
+  },
+  {
+    "location": "Blueprints Lavatory (D5)",
+    "pattern": "orange yellow orange green yellow green black yellow black",
+    "corners": "green yellow green yellow"
+  },
+  {
+    "location": "Blueprints Billiards Room (E1)",
+    "pattern": "pink white pink blue grey blue pink red pink",
+    "corners": "red red red red"
+  },
+  {
+    "location": "Blueprints Trophy Room (E2)",
+    "pattern": "white red grey grey pink grey black red white",
+    "corners": "white white white white"
+  },
+  {
+    "location": "Blueprints Foundation (E3)",
+    "pattern": "grey orange orange yellow orange black blue blue orange",
+    "corners": "orange orange orange orange"
+  },
+  {
+    "location": "Blueprints Ballroom (E4)",
+    "pattern": "green white white black white black blue white blue",
+    "corners": "blue blue blue blue"
+  },
+  {
+    "location": "Blueprints Spare Room (E5)",
+    "pattern": "black blue grey blue orange blue black orange yellow",
+    "corners": "blue blue blue blue"
+  },
+  {
+    "location": "Blueprints West Wing Hall (F1)",
+    "pattern": "black green black grey orange grey purple purple purple",
+    "corners": "purple purple purple purple"
+  },
+  {
+    "location": "Blueprints Passageway (F2)",
+    "pattern": "pink white pink orange red orange purple white purple",
+    "corners": "purple purple purple purple"
+  },
+  {
+    "location": "Blueprints Dark Room (F3)",
+    "pattern": "yellow orange yellow orange orange orange pink orange pink",
+    "corners": "orange orange orange orange"
+  },
+  {
+    "location": "Blueprints Closet (F4)",
+    "pattern": "pink orange pink orange orange orange green orange green",
+    "corners": "orange orange orange orange"
+  },
+  {
+    "location": "Blueprints Parlor Room (F5)",
+    "pattern": "black blue black black green orange blue green blue",
+    "corners": "green green green green"
+  },
+  {
+    "location": "Blueprints Gymnasium (G1)",
+    "pattern": "pink white pink black red black grey grey grey",
+    "corners": "red red red red"
+  },
+  {
+    "location": "Blueprints Laundry Room (G2)",
+    "pattern": "pink orange purple orange grey grey pink blue purple",
+    "corners": "purple purple purple purple"
+  },
+  {
+    "location": "Blueprints Guest Bedroom (G3)",
+    "pattern": "yellow yellow yellow black black black grey green grey",
+    "corners": "black yellow black yellow"
+  },
+  {
+    "location": "Blueprints Conference Room (G4)",
+    "pattern": "yellow yellow yellow black grey black orange green orange",
+    "corners": "yellow yellow yellow yellow"
+  },
+  {
+    "location": "Blueprints Den (G5)",
+    "pattern": "grey pink grey orange green orange purple grey purple",
+    "corners": "purple purple purple purple"
+  },
+  {
+    "location": "Blueprints Foyer (H1)",
+    "pattern": "green green green grey orange orange blue grey purple",
+    "corners": "green green green green"
+  },
+  {
+    "location": "Blueprints Pool (H2)",
+    "pattern": "red white yellow blue green blue blue yellow blue",
+    "corners": "red red red red"
+  },
+  {
+    "location": "Blueprints Servant's Quarters (H3)",
+    "pattern": "grey grey grey black red black white grey yellow",
+    "corners": "black black black black"
+  },
+  {
+    "location": "Blueprints Pump Room (H4)",
+    "pattern": "purple blue purple black green orange black green orange",
+    "corners": "purple purple purple purple"
+  },
+  {
+    "location": "Blueprints Furnace (H5)",
+    "pattern": "black grey grey white green white blue yellow orange",
+    "corners": "blue blue blue blue"
+  },
+  {
+    "location": "Blueprints Archives (I1)",
+    "pattern": "red grey black orange orange orange green grey purple",
+    "corners": "orange red orange red"
+  },
+  {
+    "location": "Blueprints Chapel (I2)",
+    "pattern": "blue orange blue black black orange blue orange blue",
+    "corners": "orange orange orange orange"
+  },
+  {
+    "location": "Blueprints Vestibule (I3)",
+    "pattern": "grey green grey orange black red black white purple",
+    "corners": "black purple red orange"
+  },
+  {
+    "location": "Blueprints Coat Check (I4)",
+    "pattern": "yellow green yellow black black black blue green blue",
+    "corners": "blue black black blue"
+  },
+  {
+    "location": "Blueprints Aquarium (I5)",
+    "pattern": "pink grey yellow red yellow white orange blue black",
+    "corners": "yellow yellow yellow yellow"
+  },
+  {
+    "location": "Blueprints 46th room (H5)",
+    "pattern": "orange pink orange grey green grey blue grey blue",
+    "corners": "blue blue blue blue"
+  }
+]

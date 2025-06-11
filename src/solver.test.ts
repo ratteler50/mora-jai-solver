@@ -1,4 +1,3 @@
-import { describe, test, expect } from 'vitest'
 import { solvePuzzle, formatMoves, estimateSolvability, type PuzzleState } from './solver'
 import { TileColor } from './tileLogic'
 
@@ -52,7 +51,7 @@ describe('Solver Tests', () => {
     const estimate = estimateSolvability(state)
     
     expect(estimate.likely).toBe(false)
-    expect(estimate.reason).toContain("Target color red is not present")
+    expect(estimate.reason).toContain("Target color(s) red not present on the grid")
   })
 
   test('solves simple one-move puzzle', () => {
